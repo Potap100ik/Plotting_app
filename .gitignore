@@ -1,0 +1,13 @@
+x64/
+*.vcxproj*
+*.docx
+*.vsidx
+*.ipch
+*.suo
+*.db
+*.json
+*.lastbuildstate
+*.tlog
+*.sln
+
+
