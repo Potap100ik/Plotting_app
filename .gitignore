@@ -1,6 +1,7 @@
 x64/
 !/x64/Debug/Plots_project_WINAPI.exe
 *.vcxproj*
+!.vcxproj
 *.docx
 *.vsidx
 *.ipch

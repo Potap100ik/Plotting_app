@@ -1,4 +1,5 @@
 #pragma once
+//проверяем некорректные знаки в введенной пользователем функции
 #define MAX_STRLENGTH 100
 #include <stdio.h>
 #define CANSELWORDS "()1234567890*/-+.expabslog10lnpowpisincostan"//то что нельзя удалять, если нашлось в начале строки

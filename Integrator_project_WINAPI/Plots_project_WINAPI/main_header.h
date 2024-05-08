@@ -1,5 +1,5 @@
 #pragma once
-#include "Help_wnd.h"
+#include "Debug_sys.h"
 
 //манифест для кастомизации 
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
@@ -24,7 +24,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot.setka.sx_center, y*(-1) + Wnd_Plot.setka.sy_center, d);
 #define LineTo(a, x, y); LineTo(a, x + Wnd_Plot.setka.sx_center, y*(-1) + Wnd_Plot.setka.sy_center);
 #define TextOutW(dc, x, y, s, st); TextOutW(dc, x + Wnd_Plot.setka.sx_center, y*(-1) + Wnd_Plot.setka.sy_center, s, st);
-// DrawLine(a,x1,y,x2,y2) DrawLine(a,x1 + Wnd_Plot.setka.sx_center,y*(-1) + Wnd_Plot.setka.sy_center,x2 + Wnd_Plot.setka.sx_center,y2*(-1) + Wnd_Plot.setka.sy_center)
 
 using namespace Gdiplus;
 
@@ -49,36 +48,45 @@ enum CTL_ID {
 struct Pointer {
 	double x, y;
 };
-struct Pointer_int {
-	int x, y;
+struct Pointer_lng_double {
+	long double x, y;
 };
 typedef struct Plot {
 	std::vector<Pointer> myvec_xy_picsel{};//вектор хранит пиксельные координаты x,y 
 	std::vector<Pointer> myvec_xy{};//вектор хранит реальные координаты x,y для каждой точки графика
 	double A, B, H;//получаемые из окна границы графика
-	double C;//
+	//double C;//
+
+
 }MyPlot;
 typedef struct Setka {
-	int sx_center, sy_center;//координаты центра осей координат
-	double Ar, Br, Hr, Cr;//при зумировании что-то идет по пизде
-	int h_setka, h5_setka;//пиксельные границы для сетки
-	double u5_setka;//у.е на 5 сеточных клеток
-	double kxy_setka;//коэфф. зума для графика
+	int sx_center, sy_center;
+	double LLeft, RRight, TTop, BBottom, u_HHH;
+	int h_setka, h5_setka;
+	double u5_setka;
+	double kxy_zoom;
+	double unit_to_pixel;
+	int Wide_Vec, Left_Wide_Vec, Right_Wide_Vec;
 }MySetka;
-typedef struct Wnd_Plot_ {
+typedef struct Wnd_Plot_struct {
 	HWND hWnd;
 	MyPlot plot;
 	MySetka setka;
 	int sx, sy;//размеры текушщего окна
+	//КООРДИНАТЫ КРАЕВ
+	int x_LL, y_BB, x_RR, y_TT, x_LL5, y_BB5;
+	LPSTR text_;
+
 
 }MyWnd_Plot;
 typedef struct SMouseMove {
-	 POINT Prev_mouse_point{};
-	 BOOL Flag_for_mouse;
+	POINT Prev_mouse_point{};
+	BOOL Flag_for_mouse;
 }MouseMove;
 
 
 //глобальные переменные
+const int Wide_of_Screen = GetSystemMetrics(SM_CXSCREEN);
 double IntegerSum;
 int countpaint = 0;
 std::wstring str;
@@ -95,30 +103,30 @@ hWndEdit_A{},
 hWndEdit_B{},
 hWndEdit_H{},
 hWndEdit_Integral{};
-extern HINSTANCE hInst;/////////////////////////////////////////////////////
-HWND hStat;
-HWND hWnd_help;
+extern HINSTANCE hInst;/////////////////////////////////////////////////////убери глобальные переменные потому что так надо
 HDC hdc{};
 TCHAR Win_Plot_NAME[MAX_LOADSTRING] = _T("PlotWindow");
 
 //оконные создания
-int WinMain_(HINSTANCE, HINSTANCE, LPTSTR, int);
 LPVOID CreateControls(HWND hWnd);
 ATOM MyRegisterChildClass();
 //оконные процедуры
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
 LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
 //исполнительные функции
+void Plotting_edges_upd(int);
 double Setka_unit(double get_value);//придвигает кратность юнита сетки графика к 1,2 или 5
 LPSTR Wide_into_Ascii(LPCWSTR sw);
-void transform(HDC hdc);
 void StructInit();
-void CorrectSetkaPos();
+void CorrectSetkaPos(int);
 void MousePos(BOOL, int, int);
 void DrowSetka(HDC hdc);
 void DrowCounts(HDC hdc);
 void DrowGraphSmooth(HDC hdc);
 void DrowGraph(HDC hdc);
+void FirstPlotting();
+void RedrawPlot();
+
 
 LPVOID CreateControls(HWND hWnd)
 {
@@ -210,7 +218,7 @@ LPVOID CreateControls(HWND hWnd)
 	hWndEdit_H = CreateWindowEx(
 		WS_EX_CLIENTEDGE,
 		L"EDIT",
-		L"0.1",
+		L"0,1",
 		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
 		edit_otst1 + 180, 80, 60, 30,
 		hWnd,
@@ -230,26 +238,6 @@ LPVOID CreateControls(HWND hWnd)
 		nullptr, nullptr);
 	if (!hWndEdit_Integral)
 		MessageBox(NULL, _T("hWndEdit_H"), _T("Ошибка"), MB_OK);
-
-
-	CreateWindowEx(0, L"STATIC", L"Поле для уравнения", WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst2, 15, 280, 20, hWnd, nullptr, nullptr, nullptr);
-	CreateWindowEx(0, L"STATIC", L"F(x) = ", WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst2, 42, 40, 20, hWnd, nullptr, nullptr, nullptr);
-	CreateWindowEx(0, L"STATIC", L"A = ", WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst2, 82, 40, 20, hWnd, nullptr, nullptr, nullptr);
-	CreateWindowEx(0, L"STATIC", L"B = ", WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst1 + 40, 82, 40, 20, hWnd, nullptr, nullptr, nullptr);
-	CreateWindowEx(0, L"STATIC", L"H. = ", WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst1 + 140, 82, 40, 20, hWnd, nullptr, nullptr, nullptr);
-	CreateWindowEx(0, L"STATIC", L"Интегралушка ну посчитайся ", WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst1 + 100, 240, 200, 20, hWnd, nullptr, nullptr, nullptr);
-	CreateWindowEx(0, L"STATIC", L"\
-Писать только так и никак иначе:\n\
-- + * / ( )\n\
- 'x - икс'\t'pi - 3.1415...'\n\
-esp(  )\tabs(  )\tlog(  )\n\
-log10(  )\tpow(  )\n\
-sin(  )\tcos(  )\ttan(  ),",
-WS_CHILD | SS_LEFT | WS_VISIBLE, edit_otst1, 300, 300, 200, hWnd, nullptr, nullptr, nullptr);
-
-	//hStat = CreateWindow(L"static", L"static", WS_VISIBLE,
-	//	10, 10, 400, 400, NULL, NULL, NULL, NULL);
-
 	return 0;
 }
 ATOM MyRegisterChildClass()
@@ -269,28 +257,18 @@ ATOM MyRegisterChildClass()
 //оконные процедуры
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 {
-
+	PAINTSTRUCT ps;
+	Bitmap* img{};
+	Gdiplus::Graphics* graph{};
 	switch (message)
 	{
 	case WM_CREATE:
-		CreateControls(hWnd);///////////////////////////////////////////////////////////////////////////////////////
+		CreateControls(hWnd);
 		if (!MyRegisterChildClass())
 			MessageBox(NULL, _T("НЕ ВЫШЕЛ ГРАФИК ПОГУЛЯТЬ"), _T("Ошибка"), MB_OK);
-		Wnd_Plot.hWnd = CreateWindow(
-			Win_Plot_NAME,
-			NULL,
-			WS_CHILD |
-			WS_DLGFRAME | //запрет на изменение размеров дочернего окна
-			WS_VISIBLE,
-			0, 0, 0, 0,
-			hWnd,
-			NULL,
-			hInst,
-			NULL);
+		Wnd_Plot.hWnd = CreateWindow(Win_Plot_NAME, NULL, WS_CHILD | WS_DLGFRAME | WS_VISIBLE, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
 		StructInit();
-		MousePos(FALSE, 0,0);
-		hdc = GetDC(Wnd_Plot.hWnd);
-		//break;
+		MousePos(FALSE, 0, 0);
 		return 0;
 	case WM_SIZE:
 		Wnd_Plot.sx = LOWORD(lParam) - 405;
@@ -298,59 +276,37 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		MoveWindow(Wnd_Plot.hWnd, 400, 0, Wnd_Plot.sx, Wnd_Plot.sy, 1);
 		Wnd_Plot.setka.sx_center = Wnd_Plot.sx / 2;
 		Wnd_Plot.setka.sy_center = Wnd_Plot.sy / 2;
-		//break;
 		return 0;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
 		case 	HWNDBUTTON_ENTER:
 		{
-
-			if (!Wnd_Plot.plot.myvec_xy_picsel.empty())
-			{
-				Wnd_Plot.plot.myvec_xy_picsel.clear();
-				Wnd_Plot.plot.myvec_xy.clear();
-			}
-			//Wnd_Plot.plot.myvec_xy_picsel.reserve((int)(Wnd_Plot.setka.Br - Wnd_Plot.setka.Ar) / Wnd_Plot.setka.Hr + 1);//+1 - а оно вообше надо?
-			//Wnd_Plot.plot.myvec_xy.reserve((int)(Wnd_Plot.setka.Br - Wnd_Plot.setka.Ar) / Wnd_Plot.setka.Hr + 1);//+1 - а оно вообше надо?
-			std::wstring Astr{}, Bstr, Hstr{};
-			std::wstring text;//ошибка считывания GetWindowText при вводе log(x)+tan(x)
+			std::wstring Astr, Bstr, Hstr, text;
+			Astr.reserve(MAX_LOADSTRING);
+			Bstr.reserve(MAX_LOADSTRING);
+			Hstr.reserve(MAX_LOADSTRING);
 			text.reserve(MAX_LOADSTRING);
-			//char txt[100];
-			LPWSTR lptext = (LPWSTR)malloc(MAX_LOADSTRING);
-			GetWindowText(hWndEdit_A, &Astr[0], MAX_PATH);
-			GetWindowText(hWndEdit_B, &Bstr[0], MAX_PATH);
-			GetWindowText(hWndEdit_H, &Hstr[0], MAX_PATH);
-			GetWindowText(hWndEdit_base, &text[0], MAX_PATH);
 
-			/*if (text.empty() || Astr.empty() || Bstr.empty() || Hstr.empty())
-			{
-				MessageBox(hWnd, L"Введите число!", L"Информация", MB_ICONINFORMATION | MB_OK);
-				break;
-			}*/
-			
-			//if (Astr.empty() || Bstr.empty() || Hstr.empty() || text.empty())//НЕ ФУРЫЧИТ А ДОЛЖНО, НО КАК????
-			//{
-			//	MessageBox(hWnd, L"Введите число!", L"Информация", MB_ICONINFORMATION | MB_OK);
-			//	break;
-			//}
+			GetWindowText(hWndEdit_A, &Astr[0], MAX_LOADSTRING);
+			GetWindowText(hWndEdit_B, &Bstr[0], MAX_LOADSTRING);
+			GetWindowText(hWndEdit_H, &Hstr[0], MAX_LOADSTRING);
+			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
 			Astr.erase(remove(begin(Astr), end(Astr), 0), end(Astr));
 			Bstr.erase(remove(begin(Bstr), end(Bstr), 0), end(Bstr));
 			Hstr.erase(remove(begin(Hstr), end(Hstr), 0), end(Hstr));
 			text.erase(remove(text.begin(), text.end(), 0), text.end());
 
 
-			//переводим полученное сообщение из юникода в аски
-			LPSTR text_{};
 			try {
-				text_ = Wide_into_Ascii(text.c_str());
-				Wnd_Plot.setka.Ar = Wnd_Plot.plot.A = std::stod(Astr);
-				Wnd_Plot.setka.Br = Wnd_Plot.plot.B = std::stod(Bstr);
-				Wnd_Plot.setka.Hr = Wnd_Plot.plot.H = std::stod(Hstr);
+				Wnd_Plot.text_ = Wide_into_Ascii(text.c_str());
+				Wnd_Plot.plot.A = std::stod(Astr);
+				Wnd_Plot.plot.B = std::stod(Bstr);
+				Wnd_Plot.plot.H = std::stod(Hstr);
 			}
 			catch (...)
 			{
-				//MessageBox(NULL, L"Нельзя так числа вводить!", L"Информация", MB_ICONINFORMATION | MB_OK);
+
 				HWND hStatic = CreateWindowEx(0, L"STATIC", L"", WS_CHILD | SS_LEFT | WS_VISIBLE, 305, 120, 70, 40, hWnd, nullptr, nullptr, nullptr);
 				std::wstring str = L"Введите\nчисла\n";
 				SetWindowText(hStatic, str.c_str());
@@ -358,107 +314,63 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 				DestroyWindow(hStatic);
 				break;
 			}
-			
-			Wnd_Plot.plot.C = max(abs(Wnd_Plot.plot.A), abs(Wnd_Plot.plot.B));
-			//Pointer_int point;
-			Pointer point;
-			Pointer pt;
-			IntegerSum = Integrator(Wnd_Plot.setka.Ar, Wnd_Plot.setka.Br, Wnd_Plot.setka.Hr, text_, Function_Count, Simps_method);
-			//wstring wstr = std::to_wstring(IntegerSum);
+			IntegerSum = Integrator(Wnd_Plot.plot.A, Wnd_Plot.plot.B, Wnd_Plot.plot.H, Wnd_Plot.text_, Function_Count, Simps_method);
 			SetWindowText(hWndEdit_Integral, std::to_wstring(IntegerSum).c_str());
-			for (double x = Wnd_Plot.setka.Ar; x < Wnd_Plot.setka.Br; x += Wnd_Plot.setka.Hr) {
-				point.x = pt.x = x;
-				try {
-					point.y = pt.y = Function_Count(text_, &x);
-				}
-				catch (char* str1)
-				{
-					pt.y = NAN;
-					//if (isnan(pt.y) || isinf(pt.y))//cout << "подтверждено isnan" << endl;
-					//pt.y = NAN;
-
-				}
-				//point.y = pt.y = Function_Count(text_, &x);
-
-				//if (isnan(pt.y))continue;
-				//if (isinf(pt.y))continue;
-				Wnd_Plot.plot.myvec_xy.push_back(pt);
-			}
-
-			for (int i = 0; i < Wnd_Plot.plot.myvec_xy.size(); i++)
-			{
-				Wnd_Plot.plot.myvec_xy_picsel.push_back({});
-				Wnd_Plot.plot.myvec_xy_picsel[i].x = Wnd_Plot.plot.myvec_xy[i].x * Wnd_Plot.setka.kxy_setka;
-				Wnd_Plot.plot.myvec_xy_picsel[i].y = Wnd_Plot.plot.myvec_xy[i].y * Wnd_Plot.setka.kxy_setka;
-			}
-
-			//InvalidateRect(hWnd, NULL, TRUE);
-			//}
-			//catch (...)
-			//{
-			////MessageBox(NULL, L"Число превышает 2 байта!", L"Предупреждение", MB_ICONWARNING | MB_OK);
-			//}
-			//break;
+			FirstPlotting();
+			InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
 		}
-			return 0;
+		return 0;
 		case	HWNDBUTTON_CLEARPLOT:
-			if (!Wnd_Plot.plot.myvec_xy_picsel.empty())
-			{
-				Wnd_Plot.plot.myvec_xy_picsel.clear();
-				Wnd_Plot.plot.myvec_xy.clear();
-			}
-			Wnd_Plot.setka.h_setka = 10;
-			Wnd_Plot.setka.h5_setka = 50;
-			Wnd_Plot.setka.u5_setka = Wnd_Plot.plot.C / 5;
+			Wnd_Plot.plot.myvec_xy_picsel.clear();
+			Wnd_Plot.plot.myvec_xy.clear();
+			Wnd_Plot.text_ = (LPSTR)"";
+			//CorrectSetkaPos();
 			InvalidateRect(hWnd, NULL, TRUE);
-			//break;
 			return 0;
 		case HWNDBUTTON_CLEAREDIT:
 			MessageBox(NULL, _T("КНОПКА НЕ ГОТОВА\nЗА РАБОТУ"), _T("Ошибка"), MB_OKCANCEL);
-			//break;
 			return 0;
 		case HWNDBUTTON_HOME:
 			Wnd_Plot.setka.sx_center = Wnd_Plot.sx / 2;
 			Wnd_Plot.setka.sy_center = Wnd_Plot.sy / 2;
 			Wnd_Plot.setka.h_setka = 10;
-			Wnd_Plot.setka.u5_setka = Setka_unit(Wnd_Plot.plot.C / 5);
+			Wnd_Plot.setka.u5_setka = 2;
 			Wnd_Plot.setka.h5_setka = Wnd_Plot.setka.h_setka * 5;
-			Wnd_Plot.setka.kxy_setka = Wnd_Plot.setka.h5_setka / Wnd_Plot.setka.u5_setka;
-			for (int i = 0; i < Wnd_Plot.plot.myvec_xy_picsel.size(); i++)
-			{
-				Wnd_Plot.plot.myvec_xy_picsel[i].x = Wnd_Plot.plot.myvec_xy[i].x * Wnd_Plot.setka.kxy_setka;
-				Wnd_Plot.plot.myvec_xy_picsel[i].y = Wnd_Plot.plot.myvec_xy[i].y * Wnd_Plot.setka.kxy_setka;
-			}
+			Wnd_Plot.setka.kxy_zoom = Wnd_Plot.setka.h5_setka / Wnd_Plot.setka.u5_setka;
+			Wnd_Plot.setka.unit_to_pixel = 1.0 / Wnd_Plot.setka.kxy_zoom;
+			Plotting_edges_upd(2);
+			RedrawPlot();
 			InvalidateRect(hWnd, NULL, TRUE);
-			//break;
 			return 0;
 		}
-		//break;
 		return 0;
-	case WM_DESTROY: PostQuitMessage(0); break;
-	default: return DefWindowProc(hWnd, message, wParam, lParam);
+	case WM_PAINT:
+		hdc = BeginPaint(hWnd, &ps);
+		img = Bitmap::FromFile(L"1.png");
+		graph = new Gdiplus::Graphics(hdc);
+		graph->DrawImage(img, 0, 0, 399, 445);
+		delete graph;
+		EndPaint(hWnd, &ps);
+		return 0;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		return 0;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
 LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 {
-	PAINTSTRUCT  ps;
+	PAINTSTRUCT  ps2;
 	HDC memdc;
 	HBITMAP membit;
-	//HDC hdc{};
+	HDC hdc2{};
+
 	switch (message)
 	{
 	case WM_CREATE:
-
-	//break;
-	return 0;
+		return 0;
 	case WM_LBUTTONDOWN:
 		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam));
-		//break;
-		return 0;
-	case WM_LBUTTONDBLCLK:
-		InvalidateRect(hWnd, NULL, TRUE);
-		//break;
 		return 0;
 	case WM_MOUSEMOVE:
 		if (MyMouse.Flag_for_mouse)
@@ -472,58 +384,76 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			MyMouse.Prev_mouse_point.x = x;
 			MyMouse.Prev_mouse_point.y = y;
 
-			//InvalidateRect(hWnd, NULL, TRUE);
+			Plotting_edges_upd(2);
+			if (Wnd_Plot.setka.LLeft < Wnd_Plot.setka.Left_Wide_Vec || Wnd_Plot.setka.RRight > Wnd_Plot.setka.Right_Wide_Vec)
+			{
+				Wnd_Plot.setka.Left_Wide_Vec = Wnd_Plot.setka.LLeft - (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
+				Wnd_Plot.setka.Right_Wide_Vec = Wnd_Plot.setka.LLeft + (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
+				RedrawPlot();
+			}
+
+			InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
 		}
-		//break;
 		return 0;
 	case WM_LBUTTONUP:
 		MyMouse.Flag_for_mouse = FALSE;
-		//break;
+		return 0;
+	case WM_NCLBUTTONUP:
+		MyMouse.Flag_for_mouse = FALSE;
+		return 0;
+	case WM_NCLBUTTONDOWN:
+		MyMouse.Flag_for_mouse = FALSE;
+		return 0;
+	case WM_NCMOUSELEAVE:
+		MyMouse.Flag_for_mouse = FALSE;
 		return 0;
 	case WM_MOUSEWHEEL:
+	{
+		int a = Wnd_Plot.setka.h_setka;
 		Wnd_Plot.setka.h_setka += GET_WHEEL_DELTA_WPARAM(wParam) / 120;
-		CorrectSetkaPos();
-		//InvalidateRect(hWnd, NULL, TRUE);
-		//break;
-		return 0;
+		/*{
+			if (Wnd_Plot.setka.sx_center > Wnd_Plot.sx / 2)
+				Wnd_Plot.setka.sx_center += GET_WHEEL_DELTA_WPARAM(wParam);
+			else if (Wnd_Plot.setka.sx_center == Wnd_Plot.sx / 2) {}
+			else
+				Wnd_Plot.setka.sx_center -= GET_WHEEL_DELTA_WPARAM(wParam);
+
+			if (Wnd_Plot.setka.sy_center > Wnd_Plot.sy / 2)
+				Wnd_Plot.setka.sy_center += GET_WHEEL_DELTA_WPARAM(wParam);
+			else if (Wnd_Plot.setka.sy_center == Wnd_Plot.sy / 2) {}
+			else
+				Wnd_Plot.setka.sy_center -= GET_WHEEL_DELTA_WPARAM(wParam);
+		}*/
+		CorrectSetkaPos(0);
+		InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
+	}
+	return 0;
 	case WM_SIZE:
 		Wnd_Plot.sx = LOWORD(lParam);
 		Wnd_Plot.sy = HIWORD(lParam);
-
-		//break;
 		return 0;
-	case WM_PAINT:///////////////////////////////////////////////////////////////////////////
-		//countpaint++;
-		//str = std::to_wstring(countpaint);
-		//
-		//str += L"\nWnd_Plot.setka.sy_center: ";
-		//str += std::to_wstring(Wnd_Plot.setka.sy_center);
-		//str += L"\nWnd_Plot.sy: ";
-		//str += std::to_wstring(Wnd_Plot.sy);
-		//if (Wnd_Plot.setka.sy_center < 50)
-		//{
-		//	str += L"\nWOWOWOWOWOOWOWOWWOWOOWOWOWooooooo ";
-		//}
-		//SetWindowText(hStat, str.c_str());
-		//hdc = BeginPaint(Wnd_Plot.hWnd, &ps);
-		memdc = CreateCompatibleDC(hdc);//создаем виртуальный контекст для рисования в памяти
-		membit = CreateCompatibleBitmap(hdc, Wnd_Plot.sx, Wnd_Plot.sy);//с чем компэтибл
-
-		SelectObject(memdc, membit);//в контексте memdc мы будем рисовать на картинке membit
+	case WM_ERASEBKGND:
+		return 1;
+	case WM_PAINT:
+	{
+		SimpleTimer timer;
+		hdc2 = BeginPaint(Wnd_Plot.hWnd, &ps2);
+		memdc = CreateCompatibleDC(hdc2);
+		membit = CreateCompatibleBitmap(hdc2, Wnd_Plot.sx, Wnd_Plot.sy);
+		SelectObject(memdc, membit);
 		DrowSetka(memdc);
 		DrowCounts(memdc);
 		if (!Wnd_Plot.plot.myvec_xy_picsel.empty())
 		{
 			DrowGraphSmooth(memdc);
-			//DrowGraph(memdc);
+			//DrowGraph(memdc);оставим для экспериментов - рисование без GDI+
 		}
-		BitBlt(hdc, 0, 0, Wnd_Plot.sx * 2, Wnd_Plot.sy * 2, memdc, 0, 0, SRCCOPY);
+		BitBlt(hdc2, 0, 0, Wnd_Plot.sx * 2, Wnd_Plot.sy * 2, memdc, 0, 0, SRCCOPY);
 		DeleteDC(memdc);
 		DeleteObject(membit);
-		Sleep(100);
-	   // EndPaint(Wnd_Plot.hWnd, &ps);
-		//break;
-		return 0;
+		EndPaint(Wnd_Plot.hWnd, &ps2);
+	}
+	return 0;
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -587,26 +517,40 @@ LPSTR Wide_into_Ascii(LPCWSTR sw)
 		NULL);
 	return lpStrTmp_RESULT;
 }
-void transform(HDC hdc)
-{
-	SetMapMode(hdc, MM_ANISOTROPIC);
-	SetWindowExtEx(hdc, Wnd_Plot.sx, -Wnd_Plot.sy, NULL);//установка  логические размеры - в пикселах - влияет на размеры текста и проч "писельные" переменные
-	//У.Е. (логические границы) = (реальные границы[пикс])/(указанное число x_lokal,y_lokal)
-	SetViewportExtEx(hdc, Wnd_Plot.sx, Wnd_Plot.sy, NULL);//ОБЛАСТЬ ВЫВОДА  -  физические размеры области вывода в пикселах
-	//= локальные поделить на указанные - в у.е.
-	SetViewportOrgEx(hdc, Wnd_Plot.setka.sx_center, Wnd_Plot.setka.sy_center, NULL);
-}
 void StructInit()
 {
+	Wnd_Plot.text_ = (LPSTR)"";
 	Wnd_Plot.setka.h_setka = 10;
-	Wnd_Plot.setka.h5_setka = 50; //h_setka * 5
+	Wnd_Plot.setka.h5_setka = Wnd_Plot.setka.h_setka * 5; //50
 	Wnd_Plot.setka.u5_setka = 2;
-	Wnd_Plot.setka.kxy_setka = 25;//h5_setka / u5_setka
-	Wnd_Plot.setka.Ar = -10;
-	Wnd_Plot.setka.Br = 10;
-	Wnd_Plot.setka.Cr = 10;
-	Wnd_Plot.setka.Hr = 0.1;
-	
+	Wnd_Plot.setka.kxy_zoom = Wnd_Plot.setka.h5_setka / Wnd_Plot.setka.u5_setka;//25
+	Wnd_Plot.setka.unit_to_pixel = 1.0 / Wnd_Plot.setka.kxy_zoom;
+	Plotting_edges_upd(1);
+	Wnd_Plot.setka.LLeft = Wnd_Plot.x_LL / Wnd_Plot.setka.unit_to_pixel;
+	Wnd_Plot.setka.RRight = Wnd_Plot.x_RR / Wnd_Plot.setka.unit_to_pixel;
+	Wnd_Plot.setka.TTop = Wnd_Plot.y_TT / Wnd_Plot.setka.unit_to_pixel;
+	Wnd_Plot.setka.BBottom = Wnd_Plot.y_BB / Wnd_Plot.setka.unit_to_pixel;
+
+
+
+	Wnd_Plot.setka.Wide_Vec = 4000 + Wide_of_Screen;
+	Wnd_Plot.setka.Left_Wide_Vec = -(Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
+	Wnd_Plot.setka.Right_Wide_Vec = (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
+
+	Wnd_Plot.setka.u_HHH = 2;//шаг рисовки - 2 пикселя
+	Wnd_Plot.plot.A = -10;
+	Wnd_Plot.plot.B = 10;
+	Wnd_Plot.plot.H = 0.1;
+	SetWindowText(hWndEdit_base, L"exp(exp(x))");
+	SetWindowText(hWndEdit_A, L"-10");// std::to_wstring(Wnd_Plot.plot.A).c_str()
+	SetWindowText(hWndEdit_B, L"10");
+	SetWindowText(hWndEdit_H, L"0,1");
+	SetWindowText(hWndEdit_Integral, L"Ку-ку епта");
+
+	Wnd_Plot.plot.myvec_xy_picsel.reserve(Wnd_Plot.setka.Wide_Vec + 1);
+	Wnd_Plot.plot.myvec_xy.reserve(Wnd_Plot.setka.Wide_Vec + 1);
+
+
 }
 void MousePos(BOOL fl, int x, int y)
 {
@@ -614,27 +558,45 @@ void MousePos(BOOL fl, int x, int y)
 	MyMouse.Prev_mouse_point.x = x;
 	MyMouse.Prev_mouse_point.y = y;
 }
-void CorrectSetkaPos()
+void CorrectSetkaPos(int a)
 {
-	if (Wnd_Plot.setka.h_setka <= 3)
-		Wnd_Plot.setka.h_setka = 3;
-	else if (Wnd_Plot.setka.h_setka >= 20)
-	{
-		Wnd_Plot.setka.h_setka = 10;
-		Wnd_Plot.setka.u5_setka = Setka_unit(Wnd_Plot.setka.u5_setka / 2.1);
-	}
-	else if (Wnd_Plot.setka.h_setka < 10)
-	{
-		Wnd_Plot.setka.h_setka = 19;
-		Wnd_Plot.setka.u5_setka = Setka_unit(Wnd_Plot.setka.u5_setka * 2.1);
+	static char count_resizing = 0;
 
+	{
+		if (Wnd_Plot.setka.h_setka <= 3)
+			Wnd_Plot.setka.h_setka = 3;
+		else if (Wnd_Plot.setka.h_setka >= 20)
+		{
+			count_resizing++;
+			Wnd_Plot.setka.h_setka = 10;
+			Wnd_Plot.setka.u5_setka = Setka_unit(Wnd_Plot.setka.u5_setka / 2.1);
+		}
+		else if (Wnd_Plot.setka.h_setka < 10)
+		{
+			count_resizing++;
+			Wnd_Plot.setka.h_setka = 19;
+			Wnd_Plot.setka.u5_setka = Setka_unit(Wnd_Plot.setka.u5_setka * 2.1);
+		}
 	}
+
+
+
 	Wnd_Plot.setka.h5_setka = Wnd_Plot.setka.h_setka * 5;
-	Wnd_Plot.setka.kxy_setka = Wnd_Plot.setka.h5_setka / Wnd_Plot.setka.u5_setka;
+	Wnd_Plot.setka.kxy_zoom = Wnd_Plot.setka.h5_setka / Wnd_Plot.setka.u5_setka;
+	Wnd_Plot.setka.unit_to_pixel = 1.0 / Wnd_Plot.setka.kxy_zoom;
 	for (int i = 0; i < Wnd_Plot.plot.myvec_xy_picsel.size(); i++)
 	{
-		Wnd_Plot.plot.myvec_xy_picsel[i].x = Wnd_Plot.plot.myvec_xy[i].x * Wnd_Plot.setka.kxy_setka;
-		Wnd_Plot.plot.myvec_xy_picsel[i].y = Wnd_Plot.plot.myvec_xy[i].y * Wnd_Plot.setka.kxy_setka;
+		Wnd_Plot.plot.myvec_xy_picsel[i].x = Wnd_Plot.plot.myvec_xy[i].x * Wnd_Plot.setka.kxy_zoom;
+		Wnd_Plot.plot.myvec_xy_picsel[i].y = Wnd_Plot.plot.myvec_xy[i].y * Wnd_Plot.setka.kxy_zoom;
+	}
+
+	Plotting_edges_upd(2);
+	if (Wnd_Plot.setka.LLeft < Wnd_Plot.setka.Left_Wide_Vec || Wnd_Plot.setka.RRight > Wnd_Plot.setka.Right_Wide_Vec || count_resizing > 4)
+	{
+		Wnd_Plot.setka.Left_Wide_Vec = Wnd_Plot.setka.LLeft - (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
+		Wnd_Plot.setka.Right_Wide_Vec = Wnd_Plot.setka.LLeft + (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
+		count_resizing = 0;
+		RedrawPlot();
 	}
 	return;
 }
@@ -644,41 +606,34 @@ void DrowSetka(HDC dc)
 	SetDCBrushColor(dc, RGB(255, 255, 255));
 	Rectangle(dc, 0, 0, Wnd_Plot.sx, Wnd_Plot.sy);
 	SelectObject(dc, GetStockObject(DC_PEN));
-	SetDCPenColor(dc, RGB(204, 204, 204));
-	//КООРДИНАТЫ КРАЕВ
-	const int x_LL = -(Wnd_Plot.setka.sx_center / Wnd_Plot.setka.h_setka) * Wnd_Plot.setka.h_setka;//**приведение типов -  координаты
-	const int y_BB = -((Wnd_Plot.sy - Wnd_Plot.setka.sy_center) / Wnd_Plot.setka.h_setka) * Wnd_Plot.setka.h_setka;//**приведение типов -  координаты
-	const int x_RR = Wnd_Plot.sx - Wnd_Plot.setka.sx_center;//граница правая
-	const int y_TT = Wnd_Plot.setka.sy_center;//граница нихняя
-	for (int ix = x_LL; ix < x_RR; ix += Wnd_Plot.setka.h_setka) {
-		MoveToEx(dc, ix, y_BB, NULL);
-		LineTo(dc, ix, y_TT);
+	SetDCPenColor(dc, RGB(214, 214, 214));
+	Plotting_edges_upd(0);
+
+	for (int ix = Wnd_Plot.x_LL; ix < Wnd_Plot.x_RR; ix += Wnd_Plot.setka.h_setka) {
+		MoveToEx(dc, ix, Wnd_Plot.y_BB, NULL);
+		LineTo(dc, ix, Wnd_Plot.y_TT);
 	}
-	for (int iy = y_BB; iy < y_TT; iy += Wnd_Plot.setka.h_setka) {
-		MoveToEx(dc, x_LL, iy, NULL);
-		LineTo(dc, x_RR, iy);
+	for (int iy = Wnd_Plot.y_BB; iy < Wnd_Plot.y_TT; iy += Wnd_Plot.setka.h_setka) {
+		MoveToEx(dc, Wnd_Plot.x_LL, iy, NULL);
+		LineTo(dc, Wnd_Plot.x_RR, iy);
 	}
 	//рисуем большие клетки 
 	SetDCPenColor(dc, RGB(150, 150, 150));
-
-	const int x_LL5 = ((x_LL / Wnd_Plot.setka.h5_setka) - 1) * Wnd_Plot.setka.h5_setka;//переходим в рисование больших квадратов и чисел
-	const int y_BB5 = ((y_BB / Wnd_Plot.setka.h5_setka) - 1) * Wnd_Plot.setka.h5_setka;
-	for (int ix = x_LL5; ix < x_RR; ix += Wnd_Plot.setka.h5_setka) {
-		MoveToEx(dc, ix, y_BB5, NULL);
-		LineTo(dc, ix, y_TT);
+	for (int ix = Wnd_Plot.x_LL5; ix < Wnd_Plot.x_RR; ix += Wnd_Plot.setka.h5_setka) {
+		MoveToEx(dc, ix, Wnd_Plot.y_BB5, NULL);
+		LineTo(dc, ix, Wnd_Plot.y_TT);
 	}
-	for (int iy = y_BB5; iy < y_TT; iy += Wnd_Plot.setka.h5_setka) {
-		MoveToEx(dc, x_LL5, iy, NULL);
-		LineTo(dc, x_RR, iy);
+	for (int iy = Wnd_Plot.y_BB5; iy < Wnd_Plot.y_TT; iy += Wnd_Plot.setka.h5_setka) {
+		MoveToEx(dc, Wnd_Plot.x_LL5, iy, NULL);
+		LineTo(dc, Wnd_Plot.x_RR, iy);
 	}
-	//рисуем оси координат
+	//рисуем оси координат и кромку
 	SetDCPenColor(dc, RGB(0, 0, 0));
-	MoveToEx(dc, 0, y_TT, NULL);
-	LineTo(dc, 0, y_BB);
-	MoveToEx(dc, x_LL, 0, NULL);
-	LineTo(dc, x_RR, 0);
+	MoveToEx(dc, 0, Wnd_Plot.y_TT, NULL);
+	LineTo(dc, 0, Wnd_Plot.y_BB);
+	MoveToEx(dc, Wnd_Plot.x_LL, 0, NULL);
+	LineTo(dc, Wnd_Plot.x_RR, 0);
 }
-
 void DrowCounts(HDC dc)
 {
 	HFONT hFont1 = CreateFont(10, 0, 0, 0, 600, 0, 0, 0,
@@ -690,83 +645,120 @@ void DrowCounts(HDC dc)
 	SetBkMode(dc, TRANSPARENT);
 	//рисуем числa
 	//////////////////////////////////////////////////////////////////////
-	//КООРДИНАТЫ КРАЕВ
-	const int x_LL = -(Wnd_Plot.setka.sx_center / Wnd_Plot.setka.h_setka) * Wnd_Plot.setka.h_setka;//**приведение типов -  координаты
-	const int y_BB = -((Wnd_Plot.sy - Wnd_Plot.setka.sy_center) / Wnd_Plot.setka.h_setka) * Wnd_Plot.setka.h_setka;//**приведение типов -  координаты
-	const int x_RR = Wnd_Plot.sx - Wnd_Plot.setka.sx_center;//граница правая
-	const int y_TT = Wnd_Plot.setka.sy_center;//граница нихняя
-	//расстояние от центра СК до отрицательных краев
-	const int x_LL5 = ((x_LL / Wnd_Plot.setka.h5_setka)+1) * Wnd_Plot.setka.h5_setka;//переходим в рисование больших квадратов и чисел
-	const int y_BB5 = ((y_BB / Wnd_Plot.setka.h5_setka)+1) * Wnd_Plot.setka.h5_setka;
-
+	Plotting_edges_upd(1);
 	//уходим в отрицательное крайнее значение графика X
-	double ux = Wnd_Plot.setka.u5_setka * x_LL5 / Wnd_Plot.setka.h5_setka;
+	double ux = Wnd_Plot.setka.u5_setka * Wnd_Plot.x_LL5 / Wnd_Plot.setka.h5_setka;
 	TCHAR s[20];
 	int zerocount = 0;//проверка на вещественность иди целостность координат
 	if (Wnd_Plot.setka.u5_setka < 1)zerocount = abs(round(log10(Wnd_Plot.setka.u5_setka))) + 1;
 	SetTextAlign(dc, TA_TOP | TA_CENTER);
-	INT TERPILA;
-	for (int ix = x_LL5; ix < x_RR - Wnd_Plot.setka.h5_setka; ix += Wnd_Plot.setka.h5_setka) {
+	for (int ix = Wnd_Plot.x_LL5; ix < Wnd_Plot.x_RR - Wnd_Plot.setka.h5_setka; ix += Wnd_Plot.setka.h5_setka) {
+
 		_stprintf(s, L"%.*lf", zerocount, ux);
+		if (abs(ix) < Wnd_Plot.setka.h_setka)
+		{
+			_stprintf(s, L"%d", 0);
+			TextOutW(dc, ix + 10, -8, s, _tcslen(s));
+		}
+		else {
 
-		TextOutW(dc, ix, (y_TT - 10), s, _tcslen(s));//рисуем на топе доп координаты
-		MoveToEx(dc, ix, (y_TT - 10), NULL);
-		LineTo(dc, ix, (y_TT + 10));
+			TextOutW(dc, ix, (Wnd_Plot.y_TT - 10), s, _tcslen(s));//рисуем на топе доп координаты
+			MoveToEx(dc, ix, (Wnd_Plot.y_TT - 10), NULL);
+			LineTo(dc, ix, (Wnd_Plot.y_TT + 10));
 
-		//КОСТЫЛИ ДЛЯ DEFINE - НУ УСТАЛ Я ИСКАТЬ КАК С ЭТИМ БОРОТЬСЯ -- 2 ЧАСА ушло на понимание того, что чтоб сработал макрос, надо поставить скобочки
-		TextOutW(dc, ix, (y_BB + 20), s, _tcslen(s));
-		MoveToEx(dc, ix, (y_BB - 10), NULL);
-		LineTo(dc, ix, (y_BB + 10));
+			TextOutW(dc, ix, (Wnd_Plot.y_BB + 20), s, _tcslen(s));
+			MoveToEx(dc, ix, (Wnd_Plot.y_BB - 10), NULL);
+			LineTo(dc, ix, (Wnd_Plot.y_BB + 10));
 
-		TextOutW(dc, ix, -10, s, _tcslen(s));
-		MoveToEx(dc, ix, -10, NULL);
-		LineTo(dc, ix, 10);
+			TextOutW(dc, ix, -10, s, _tcslen(s));
+			MoveToEx(dc, ix, -10, NULL);
+			LineTo(dc, ix, 10);
+		}
 		ux += Wnd_Plot.setka.u5_setka;
 	}
 	//уходим в отрицательное крайнее значение графика Y
-	double uy = Wnd_Plot.setka.u5_setka * y_BB5 / Wnd_Plot.setka.h5_setka;
-	SetTextAlign(dc, TA_LEFT| TA_CENTER);
-	for (int iy = y_BB5; iy < y_TT - Wnd_Plot.setka.h5_setka; iy += Wnd_Plot.setka.h5_setka) {
+	double uy = Wnd_Plot.setka.u5_setka * Wnd_Plot.y_BB5 / Wnd_Plot.setka.h5_setka;
+	SetTextAlign(dc, TA_LEFT | TA_CENTER);
+	for (int iy = Wnd_Plot.y_BB5; iy < Wnd_Plot.y_TT - Wnd_Plot.setka.h5_setka; iy += Wnd_Plot.setka.h5_setka) {
 		_stprintf(s, L"%.*lf", zerocount, uy);
 
-		TextOutW(dc, 15, iy, s, _tcslen(s));
-		MoveToEx(dc, 10, iy, NULL);
-		LineTo(dc, -10, iy);
+		if (abs(iy) < Wnd_Plot.setka.h_setka){}
+		else {
+			TextOutW(dc, 15, iy, s, _tcslen(s));
+			MoveToEx(dc, 10, iy, NULL);
+			LineTo(dc, -10, iy);
 
-		TextOutW(dc, (x_LL + 15), iy, s, _tcslen(s));
-		MoveToEx(dc, (x_LL + 10), iy, NULL);
-		LineTo(dc, (x_LL - 10), iy);
+			TextOutW(dc, (Wnd_Plot.x_LL + 15), iy, s, _tcslen(s));
+			MoveToEx(dc, (Wnd_Plot.x_LL + 10), iy, NULL);
+			LineTo(dc, (Wnd_Plot.x_LL - 10), iy);
 
-		TextOutW(dc, (x_RR - 20), (iy + 5), s, _tcslen(s));
-		MoveToEx(dc, (x_RR + 10), iy, NULL);
-		LineTo(dc, (x_RR - 10), iy);
+			TextOutW(dc, (Wnd_Plot.x_RR - 20), (iy + 5), s, _tcslen(s));
+			MoveToEx(dc, (Wnd_Plot.x_RR + 10), iy, NULL);
+			LineTo(dc, (Wnd_Plot.x_RR - 10), iy);
+		}
 		uy += Wnd_Plot.setka.u5_setka;
 	}
+
+	//рисуем кромочку
+	MoveToEx(dc, Wnd_Plot.x_LL, Wnd_Plot.y_TT, NULL);
+	LineTo(dc, Wnd_Plot.x_LL, Wnd_Plot.y_BB);
+	MoveToEx(dc, Wnd_Plot.x_RR - 1, Wnd_Plot.y_TT, NULL);
+	LineTo(dc, Wnd_Plot.x_RR - 1, Wnd_Plot.y_BB);
+
 	DeleteObject(hFont1);
 }
 void DrowGraphSmooth(HDC dc)
 {
-	Graphics* myGraphics = new Graphics(dc);
+	Gdiplus::Graphics* graph = new (Gdiplus::Graphics)(dc);
+	Gdiplus::Bitmap* buffer = new (Gdiplus::Bitmap)(Wnd_Plot.sx, Wnd_Plot.sy);
+	Gdiplus::Graphics* myGraphics = new (Gdiplus::Graphics)(buffer);
 	myGraphics->SetSmoothingMode(SmoothingModeAntiAlias);
 	Pen* myPen = new Pen(Color(1000, 255, 0, 0), 2);
-	for (int i = 1; i < Wnd_Plot.plot.myvec_xy_picsel.size(); i++)
+	int i = 0;
+	while (Wnd_Plot.plot.myvec_xy[i].x < Wnd_Plot.setka.LLeft)
+	{
+		++i;
+	}
+	int j = i;
+	while (Wnd_Plot.plot.myvec_xy[j].x < Wnd_Plot.setka.RRight)
+	{
+		++j;
+	}
+
+	for (; i < j; i++)
 	{
 		if (isnan(Wnd_Plot.plot.myvec_xy_picsel[i - 1].y)) {
 			i++; continue;
 		}
-		myGraphics->DrawLine(myPen, 
+		myGraphics->DrawLine(myPen,
 			((int)(Wnd_Plot.plot.myvec_xy_picsel[i - 1].x)) + Wnd_Plot.setka.sx_center,
 			((int)(Wnd_Plot.plot.myvec_xy_picsel[i - 1].y)) * (-1) + Wnd_Plot.setka.sy_center,
-			((int)(Wnd_Plot.plot.myvec_xy_picsel[i].x))		+ Wnd_Plot.setka.sx_center,
-			((int)(Wnd_Plot.plot.myvec_xy_picsel[i].y))		* (-1) + Wnd_Plot.setka.sy_center);
+			((int)(Wnd_Plot.plot.myvec_xy_picsel[i].x)) + Wnd_Plot.setka.sx_center,
+			((int)(Wnd_Plot.plot.myvec_xy_picsel[i].y)) * (-1) + Wnd_Plot.setka.sy_center);
 	}
+
+	Gdiplus::CachedBitmap  cBitmap(buffer, graph);
+	graph->DrawCachedBitmap(&cBitmap, 0, 0);
+	delete buffer;
+	delete graph;
 	delete myGraphics;
 	delete myPen;
 }
 void DrowGraph(HDC dc)
 {
-	SelectObject(dc, CreatePen(PS_SOLID, 3, RGB(255, 0, 0)));
-	for (int i = 1; i < Wnd_Plot.plot.myvec_xy_picsel.size(); i++)
+	SelectObject(dc, CreatePen(PS_SOLID, 5, RGB(255, 0, 50)));
+	int i = 0;
+	while (Wnd_Plot.plot.myvec_xy[i].x < Wnd_Plot.setka.LLeft)
+	{
+		++i;
+	}
+	int j = i;
+	while (Wnd_Plot.plot.myvec_xy[j].x < Wnd_Plot.setka.RRight)
+	{
+		++j;
+	}
+
+	for (; i < j; i++)
 	{
 
 		if (isnan(Wnd_Plot.plot.myvec_xy_picsel[i - 1].y)) {
@@ -774,5 +766,107 @@ void DrowGraph(HDC dc)
 		}
 		MoveToEx(dc, Wnd_Plot.plot.myvec_xy_picsel[i - 1].x, Wnd_Plot.plot.myvec_xy_picsel[i - 1].y, NULL);
 		LineTo(dc, Wnd_Plot.plot.myvec_xy_picsel[i].x, Wnd_Plot.plot.myvec_xy_picsel[i].y);
+	}
+}
+void Plotting_edges_upd(int draw_h5_inside_or_not)
+{
+	switch (draw_h5_inside_or_not)
+	{
+	case 0:
+		//КООРДИНАТЫ СЕТОЧНЫХ КРАЕВ
+		Wnd_Plot.x_LL = -(Wnd_Plot.setka.sx_center / Wnd_Plot.setka.h_setka + 1) * Wnd_Plot.setka.h_setka;//**приведение типов -  координаты
+		Wnd_Plot.y_BB = -((Wnd_Plot.sy - Wnd_Plot.setka.sy_center + 1) / Wnd_Plot.setka.h_setka) * Wnd_Plot.setka.h_setka;//**приведение типов -  координаты
+		Wnd_Plot.x_RR = Wnd_Plot.sx - Wnd_Plot.setka.sx_center;//граница правая
+		Wnd_Plot.y_TT = Wnd_Plot.setka.sy_center;//граница нихняя
+		//расстояние от центра СК до отрицательных краев большой сетки
+		Wnd_Plot.x_LL5 = ((Wnd_Plot.x_LL / Wnd_Plot.setka.h5_setka) - 1) * Wnd_Plot.setka.h5_setka;//переходим в рисование больших квадратов и чисел
+		Wnd_Plot.y_BB5 = ((Wnd_Plot.y_BB / Wnd_Plot.setka.h5_setka) - 1) * Wnd_Plot.setka.h5_setka;
+
+		break;
+	case 1:
+		//КООРДИНАТЫ КРАЕВ
+		Wnd_Plot.x_LL = -(Wnd_Plot.setka.sx_center);//**приведение типов -  координаты
+		Wnd_Plot.y_BB = -(Wnd_Plot.sy - Wnd_Plot.setka.sy_center);//**приведение типов -  координаты
+		Wnd_Plot.x_RR = Wnd_Plot.sx - Wnd_Plot.setka.sx_center;//граница правая
+		Wnd_Plot.y_TT = Wnd_Plot.setka.sy_center;//граница нихняя
+		//расстояние от центра СК до отрицательных краев
+		Wnd_Plot.x_LL5 = ((Wnd_Plot.x_LL / Wnd_Plot.setka.h5_setka) + 1) * Wnd_Plot.setka.h5_setka;//переходим в рисование больших квадратов и чисел
+		Wnd_Plot.y_BB5 = ((Wnd_Plot.y_BB / Wnd_Plot.setka.h5_setka) + 1) * Wnd_Plot.setka.h5_setka;
+		break;
+	case 2:
+		Plotting_edges_upd(1);
+		Wnd_Plot.setka.LLeft = Wnd_Plot.x_LL * Wnd_Plot.setka.unit_to_pixel;
+		Wnd_Plot.setka.RRight = Wnd_Plot.x_RR * Wnd_Plot.setka.unit_to_pixel;
+		Wnd_Plot.setka.TTop = Wnd_Plot.y_TT * Wnd_Plot.setka.unit_to_pixel;
+		Wnd_Plot.setka.BBottom = Wnd_Plot.y_BB * Wnd_Plot.setka.unit_to_pixel;
+
+		break;
+	}
+	return;
+}
+void FirstPlotting()
+{
+
+	Wnd_Plot.plot.myvec_xy_picsel.clear();
+	Wnd_Plot.plot.myvec_xy.clear();
+	Pointer point;
+	long double y;
+	int i = 0;
+	for (double x = Wnd_Plot.setka.Left_Wide_Vec;
+		x < Wnd_Plot.setka.Right_Wide_Vec;
+		x += Wnd_Plot.setka.unit_to_pixel) {
+		point.x = x;
+		try {
+			y = Function_Count(Wnd_Plot.text_, &x);
+			if (y > DBL_MAX) y = numeric_limits<double>::infinity();
+			point.y = y;
+		}
+		catch (char* str1)
+		{
+			point.y = NAN;
+		}
+
+		Wnd_Plot.plot.myvec_xy.push_back(point);
+		++i;
+	}
+
+	for (int i = 0; i < Wnd_Plot.plot.myvec_xy.size(); i++)
+	{
+		Wnd_Plot.plot.myvec_xy_picsel.push_back({});
+		Wnd_Plot.plot.myvec_xy_picsel[i].x = Wnd_Plot.plot.myvec_xy[i].x * Wnd_Plot.setka.kxy_zoom;
+		Wnd_Plot.plot.myvec_xy_picsel[i].y = Wnd_Plot.plot.myvec_xy[i].y * Wnd_Plot.setka.kxy_zoom;
+	}
+}
+void RedrawPlot()
+{
+	if (strlen(Wnd_Plot.text_) == 0) return;
+	Wnd_Plot.plot.myvec_xy_picsel.clear();
+	Wnd_Plot.plot.myvec_xy.clear();
+	Pointer point;
+	long double y;
+	int i = 0;
+	for (double x = Wnd_Plot.setka.Left_Wide_Vec;
+		x < Wnd_Plot.setka.Right_Wide_Vec;
+		x += Wnd_Plot.setka.unit_to_pixel) {
+		point.x = x;
+		try {
+			y = Function_Count(Wnd_Plot.text_, &x);
+			if (y > DBL_MAX) y = numeric_limits<double>::infinity();
+			point.y = y;
+		}
+		catch (char* str1)
+		{
+			point.y = NAN;
+		}
+
+		Wnd_Plot.plot.myvec_xy.push_back(point);
+		++i;
+	}
+
+	for (int i = 0; i < Wnd_Plot.plot.myvec_xy.size(); i++)
+	{
+		Wnd_Plot.plot.myvec_xy_picsel.push_back({});
+		Wnd_Plot.plot.myvec_xy_picsel[i].x = Wnd_Plot.plot.myvec_xy[i].x * Wnd_Plot.setka.kxy_zoom;
+		Wnd_Plot.plot.myvec_xy_picsel[i].y = Wnd_Plot.plot.myvec_xy[i].y * Wnd_Plot.setka.kxy_zoom;
 	}
 }

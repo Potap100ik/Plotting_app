@@ -12,7 +12,7 @@ using namespace std;
 
 enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, BRAKET, E, PI, XX };
 
-double Function_Count(char* str, double* x, int y);
+long double Function_Count(char* str, double* x, int y);
 int Index_of_smth(char* str);
 int Index_of_smth(char* str, char ch1, char ch2);
 char* StrCut(char* str, double* x, int y, FUNC en);
@@ -170,7 +170,7 @@ int Index_of_smth(char* str)
 
 
 // y - знак первого числа в строке
-double Function_Count(char* str, double* x, int y = 1)
+long double Function_Count(char* str, double* x, int y = 1)
 {
 
 
