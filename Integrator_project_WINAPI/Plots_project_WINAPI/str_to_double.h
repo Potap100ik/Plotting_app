@@ -12,7 +12,7 @@ using namespace std;
 
 enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, BRAKET, E, PI, XX };
 
-long double Function_Count(char* str, double* x, int y);
+long double Function_String_to_Double(char* str, double* x, int y);
 int Index_of_smth(char* str);
 int Index_of_smth(char* str, char ch1, char ch2);
 char* StrCut(char* str, double* x, int y, FUNC en);
@@ -36,39 +36,39 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипуляц
 	switch (en)
 	{
 	case EXP:
-		sprintf(str1, "%lf", exp(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", exp(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case ABS:
-		sprintf(str1, "%lf", abs(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", abs(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case LOG:
-		sprintf(str1, "%lf", log(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", log(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case LOG10:
-		sprintf(str1, "%lf", log10(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", log10(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case POW:
 	{
 		int index2 = strcspn(str, ";");
 		strcpy(str1, str);
 		str1[index2] = '\0';
-		sprintf(str1, "%lf", pow(Function_Count(str1 + 1, x, y), Function_Count(str2 + index2 + 1, x, y)));
+		sprintf(str1, "%lf", pow(Function_String_to_Double(str1 + 1, x, y), Function_String_to_Double(str2 + index2 + 1, x, y)));
 	}
 	break;
 	case SQRT:
-		sprintf(str1, "%lf", sqrt(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", sqrt(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case SIN:
-		sprintf(str1, "%lf", sin(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", sin(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case COS:
-		sprintf(str1, "%lf", cos(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", cos(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case TAN:
-		sprintf(str1, "%lf", tan(Function_Count(str2 + 1, x, y)));
+		sprintf(str1, "%lf", tan(Function_String_to_Double(str2 + 1, x, y)));
 		break;
 	case BRAKET:
-		sprintf(str1, "%lf", Function_Count(str2 + 1, x, y));
+		sprintf(str1, "%lf", Function_String_to_Double(str2 + 1, x, y));
 		break;
 	default:
 		cout << "ERROR 6 - хулиганство функционального масштаба - ПОЗОВИТЕ РАЗРАБА И СКАЖИТЕ ЧТО ВЫ СДЕЛАЛИ" << endl;
@@ -79,8 +79,9 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипуляц
 	fl = (strncmp(str1, "+nan(ind)", 4) == 0 || strncmp(str1, "-nan(ind)", 4) == 0 || strncmp(str1, "nan", 3) == 0 || strcmp(str1, "nan)") == 0 || strcmp(str1, "-inf") == 0 || strcmp(str1, "+inf") == 0 || strcmp(str1, "inf") == 0);
 	if (fl)
 	{
-		throw(str1);
-		exit;
+		double nani = NAN;
+		throw(nani);
+		//throw(str1);
 	}
 	memcpy(str1 + strlen(str1), str + index, strlen(str) - index + 1);
 	//str1 + strlen(str1)		- индекс элемента '\0', следующего за основной записью 
@@ -170,7 +171,7 @@ int Index_of_smth(char* str)
 
 
 // y - знак первого числа в строке
-long double Function_Count(char* str, double* x, int y = 1)
+long double Function_String_to_Double(char* str, double* x, int y = 1)
 {
 
 
@@ -210,15 +211,15 @@ long double Function_Count(char* str, double* x, int y = 1)
 
 					switch (ch)
 					{
-					case '+': return d * Function_Count(str1, x) + Function_Count(str2, x);
-					case '-': return d * Function_Count(str1, x) - Function_Count(str2, x);
+					case '+': return d * Function_String_to_Double(str1, x) + Function_String_to_Double(str2, x);
+					case '-': return d * Function_String_to_Double(str1, x) - Function_String_to_Double(str2, x);
 					}
 					//Function_Count(str1, x) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
 					//Function_Count(str2, x) - выражение 2, которое высчитывается отдельно
 				}
 				else
 				{
-					return y * atof(str1) * Function_Count(str2, x);
+					return y * atof(str1) * Function_String_to_Double(str2, x);
 				}
 			}
 			case '/':
@@ -234,15 +235,15 @@ long double Function_Count(char* str, double* x, int y = 1)
 
 					switch (ch)
 					{
-					case '+': return d / Function_Count(str1, x) + Function_Count(str2, x);
-					case '-': return d / Function_Count(str1, x) - Function_Count(str2, x);
+					case '+': return d / Function_String_to_Double(str1, x) + Function_String_to_Double(str2, x);
+					case '-': return d / Function_String_to_Double(str1, x) - Function_String_to_Double(str2, x);
 					}
 					//Function_Count(str1, x) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
 					//Function_Count(str2, x) - выражение 2, которое высчитывается отдельно
 				}
 				else
 				{
-					return y * atof(str1) / Function_Count(str2, x);
+					return y * atof(str1) / Function_String_to_Double(str2, x);
 				}
 			}
 			case '+':
@@ -257,8 +258,8 @@ long double Function_Count(char* str, double* x, int y = 1)
 
 					switch (ch)
 					{
-					case '*': return d + (Function_Count(str1, x) * Function_Count(str2, x));
-					case '/': return d + (Function_Count(str1, x) / Function_Count(str2, x));
+					case '*': return d + (Function_String_to_Double(str1, x) * Function_String_to_Double(str2, x));
+					case '/': return d + (Function_String_to_Double(str1, x) / Function_String_to_Double(str2, x));
 					}
 					//Function_Count(str1) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
 					//Function_Count(str2) - выражение 2, которое высчитывается отдельно
@@ -266,7 +267,7 @@ long double Function_Count(char* str, double* x, int y = 1)
 
 				else
 				{
-					return y * atof(str1) + Function_Count(str2, x);
+					return y * atof(str1) + Function_String_to_Double(str2, x);
 				}
 			}
 			case '-':
@@ -281,8 +282,8 @@ long double Function_Count(char* str, double* x, int y = 1)
 
 					switch (ch)
 					{
-					case '*': return d - (Function_Count(str1, x) * Function_Count(str2, x));
-					case '/': return d - (Function_Count(str1, x) / Function_Count(str2, x));
+					case '*': return d - (Function_String_to_Double(str1, x) * Function_String_to_Double(str2, x));
+					case '/': return d - (Function_String_to_Double(str1, x) / Function_String_to_Double(str2, x));
 					}
 					//Function_Count(str1) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
 					//Function_Count(str2) - выражение 2, которое высчитывается отдельно
@@ -290,7 +291,7 @@ long double Function_Count(char* str, double* x, int y = 1)
 
 				else
 				{
-					return y * atof(str1) - Function_Count(str2, x);
+					return y * atof(str1) - Function_String_to_Double(str2, x);
 				}
 			}
 			default:
@@ -302,12 +303,12 @@ long double Function_Count(char* str, double* x, int y = 1)
 #endif //DEBUG
 				if (u) {
 					char_to_clear(str, str[index]);
-					return Function_Count(str, x, y);
+					return Function_String_to_Double(str, x, y);
 				}
 
 				else {
 					cout << "нет так нет" << endl;
-					return Function_Count(str + 1, x, y);
+					return Function_String_to_Double(str + 1, x, y);
 
 				}
 			}
@@ -318,12 +319,12 @@ long double Function_Count(char* str, double* x, int y = 1)
 	}
 	else if (str[0] == '-')
 	{
-		return Function_Count(str + 1, x, -1);
+		return (-1)*Function_String_to_Double(str + 1, x);
 	}
 	else if (str[0] == 'x') {
 
 
-		return Function_Count(StrCut(str + 1, x, y, XX), x, y);
+		return Function_String_to_Double(StrCut(str + 1, x, y, XX), x, y);
 	}
 	else if (str[0] == '(')
 	{
@@ -331,7 +332,7 @@ long double Function_Count(char* str, double* x, int y = 1)
 		int index = Index_of_smth(str);
 		if (strlen(str) == index + 1) {//закрывающая скобочка даного выражения была последней в строке - можно его же и возвращать, но без скобок
 			str[index] = '\0';
-			return Function_Count(str + 1, x, y);
+			return Function_String_to_Double(str + 1, x, y);
 		}
 		else if (index == 1)
 		{
@@ -343,15 +344,15 @@ long double Function_Count(char* str, double* x, int y = 1)
 			if (u) {
 				char_to_delete(str, 0);
 				char_to_delete(str, 1);
-				return Function_Count(str, x, y);
+				return Function_String_to_Double(str, x, y);
 			}
 
 			else {
 				cout << "нет так нет" << endl;
-				return Function_Count(str + 2, x, y);
+				return Function_String_to_Double(str + 2, x, y);
 
 			};
-			return Function_Count(str + 2, x, y);
+			return Function_String_to_Double(str + 2, x, y);
 		}
 		else if (index == 0)
 		{
@@ -362,15 +363,15 @@ long double Function_Count(char* str, double* x, int y = 1)
 #endif //DEBUG
 			if (u) {
 				char_to_delete(str, index);
-				return Function_Count(str, x, y);
+				return Function_String_to_Double(str, x, y);
 			}
 			else {
-				return Function_Count(str + 1, x, y);
+				return Function_String_to_Double(str + 1, x, y);
 			}
 		}
 		else//закрывающая скобочка находится посередине - значит необходимо высчитать ее значение и заменить числом, вернуть в функцию
 		{
-			return Function_Count(StrCut(str, x, y, index, BRAKET), x, y);
+			return Function_String_to_Double(StrCut(str, x, y, index, BRAKET), x, y);
 		}
 	}
 	/////////////////////////////////////////////////////////////////////////////////////0 или 1
@@ -383,67 +384,67 @@ long double Function_Count(char* str, double* x, int y = 1)
 			if (strncmp(str, "exp(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3/*отcекается exp*/, x, y, index, EXP), x, y);
+				return Function_String_to_Double(StrCut(str + 3/*отcекается exp*/, x, y, index, EXP), x, y);
 			}
 			else
 			{
-				return Function_Count(StrCut(str + 1, x, y, E), x, y);//мы ввели экспоненту
+				return Function_String_to_Double(StrCut(str + 1, x, y, E), x, y);//мы ввели экспоненту
 			}
 			break;
 		case'a':
 			if (strncmp(str, "abs(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3, x, y, index, ABS), x, y);
+				return Function_String_to_Double(StrCut(str + 3, x, y, index, ABS), x, y);
 			}
 			break;
 		case'l':
 			if (strncmp(str, "log(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3, x, y, index, LOG), x, y);
+				return Function_String_to_Double(StrCut(str + 3, x, y, index, LOG), x, y);
 			}
 			else if (strncmp(str, "ln(", 3) == 0)
 			{
 				int index = Index_of_smth(str + 2);
-				return Function_Count(StrCut(str + 2, x, y, index, LOG), x, y);
+				return Function_String_to_Double(StrCut(str + 2, x, y, index, LOG), x, y);
 			}
 			else if (strncmp(str, "log10(", 6) == 0)
 			{
 				int index = Index_of_smth(str + 5);
-				return Function_Count(StrCut(str + 5, x, y, index, LOG10), x, y);
+				return Function_String_to_Double(StrCut(str + 5, x, y, index, LOG10), x, y);
 			}
 			break;
 		case'p':
 			if (strncmp(str, "pow(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3, x, y, index, POW), x, y);
+				return Function_String_to_Double(StrCut(str + 3, x, y, index, POW), x, y);
 			}
 			else if (strncmp(str, "pi", 2) == 0)
 			{
-				return Function_Count(StrCut(str + 2, x, y, PI), x, y);
+				return Function_String_to_Double(StrCut(str + 2, x, y, PI), x, y);
 			}
 			break;
 		case's':
 			if (strncmp(str, "sin(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3, x, y, index, SIN), x, y);
+				return Function_String_to_Double(StrCut(str + 3, x, y, index, SIN), x, y);
 			}
 			break;
 		case'c':
 			if (strncmp(str, "cos(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3, x, y, index, COS), x, y);
+				return Function_String_to_Double(StrCut(str + 3, x, y, index, COS), x, y);
 			}
 			break;
 		case't':
 			if (strncmp(str, "tan(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
-				return Function_Count(StrCut(str + 3, x, y, index, TAN), x, y);
+				return Function_String_to_Double(StrCut(str + 3, x, y, index, TAN), x, y);
 			}
 			break;
 		}
@@ -454,12 +455,12 @@ long double Function_Count(char* str, double* x, int y = 1)
 #endif //DEBUG
 		if (u) {
 			char_to_clear(str, str[0]);
-			return Function_Count(str, x, y);
+			return Function_String_to_Double(str, x, y);
 		}
 
 		else {
 			cout << "нет так нет" << endl;
-			return Function_Count(str + 1, x, y);
+			return Function_String_to_Double(str + 1, x, y);
 
 		}
 	}
@@ -472,12 +473,12 @@ long double Function_Count(char* str, double* x, int y = 1)
 #endif //DEBUG
 		if (u) {
 			char_to_clear(str, str[0]);
-			return Function_Count(str, x, y);
+			return Function_String_to_Double(str, x, y);
 		}
 
 		else {
 			cout << "нет так нет" << endl;
-			return Function_Count(str + 1, x, y);
+			return Function_String_to_Double(str + 1, x, y);
 
 		}
 	}

@@ -1,6 +1,7 @@
 //#include <iostream>
 //#include <stdio.h>
-#include "main_counter.h"
+#include "..\\..\\Integrator_project_WINAPI\\Plots_project_WINAPI\\str_to_double.h"
+#include "..\\..\\Integrator_project_WINAPI\\Plots_project_WINAPI\\char_change.h"
 //#include "X_change.h"
 using namespace std;
 
@@ -15,7 +16,7 @@ int main()
 		double x = 4.63;
 
 
-		double c;
+		long double c;
 		
 		while (true)
 		{
@@ -23,12 +24,15 @@ int main()
 			cin >> str;
 			cout << endl;
 			try {
-				c = Function_Count(char_to_swap(str, x, 'x'),&x);
+				c = Function_String_to_Double(str, &x);
 			}
-			catch (char* str1)
+			catch (double error)
+			//catch (char * str1)
 			{
-				c = atof(str1);
-				cout << str << " = " << c <<"     ошибочка вышла" << endl;
+				//c = atof(str1);
+				//cout << str << " = " << c <<"     ошибочка вышла" << endl;
+				c = error;
+				cout <<" c = " << c << "   ошибочка вышла" << endl;
 				if (isnan(c))cout << "подтверждено isnan" << endl;
 				if (isinf(c))cout << "подтверждено isinf" << endl;
 

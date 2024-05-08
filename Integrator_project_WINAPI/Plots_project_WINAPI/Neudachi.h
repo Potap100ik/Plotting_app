@@ -5,6 +5,8 @@
 -------
 ебаный gdi+ - почему его так сложно активировать
 -------
+100 лет прошло. а с помощью стандартного GDI картинки и иконки так и не выводятся
+-------
 ну вот, года не прошло и появилась синкхронизация с гитом - ураааа
 ------- DrawLine(a,x1,y,x2,y2) DrawLine(a,x1 + Wnd_Plot.setka.sx_center,y*(-1) + Wnd_Plot.setka.sy_center,x2 + Wnd_Plot.setka.sx_center,y2*(-1) + Wnd_Plot.setka.sy_center)
 это понималось очень долго в отношении moveto и lineto - надо было всего то поставить скобки внутри функций - и все бы заработало
@@ -79,8 +81,17 @@ break; - он должен быть после операторов моего избранного case, а не перед ними 
 -------
 переполнение меня забуллило - хз как это решить пусть try catch ловят
 -------
-
-
+				HWND hStatic = CreateWindowEx(0, L"STATIC", L"", WS_CHILD | SS_LEFT | WS_VISIBLE, 305, 120, 70, 40, hWnd, nullptr, nullptr, nullptr);
+				std::wstring str = L"Введите\nчисла\n";
+				SetWindowText(hStatic, str.c_str());
+				Sleep(1000);
+				DestroyWindow(hStatic);
+				break;
+ну допустим теперь месседж боксы норм работают
+-------
+с обработками бесконечностей и бесконечных несоответствий типов данных в throw, try-catch разобрались
+-------
+пора бы и понять  почему InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE); не хочет перерисовывать окно когда я создаю график. 
 
 
 

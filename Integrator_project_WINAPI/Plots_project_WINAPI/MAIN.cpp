@@ -32,8 +32,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	wc.lpszClassName = WidMain_NAME;
 	wc.lpfnWndProc = WinProc; 
 	wc.style = CS_HREDRAW | CS_VREDRAW; 
-	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-	wc.hCursor = LoadCursor(NULL, IDC_ARROW); 
+	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.lpszMenuName = NULL;
 	wc.cbClsExtra = 0; 
 	wc.cbWndExtra = 0; 

@@ -2,6 +2,7 @@
 #include <chrono>
 #include <iostream>
 class SimpleTimer
+
 {
 public:
 	SimpleTimer() {
