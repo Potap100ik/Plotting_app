@@ -10,7 +10,6 @@ x64/
 *.json
 *.lastbuildstate
 *.tlog
-*.sln
 *.aps
 
 

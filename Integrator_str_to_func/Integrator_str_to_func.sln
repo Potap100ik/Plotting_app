@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Integrator_str_to_func", "Integrator_str_to_func\Integrator_str_to_func.vcxproj", "{196A8F21-53BF-4D20-8955-C60270149292}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{196A8F21-53BF-4D20-8955-C60270149292}.Debug|x64.ActiveCfg = Debug|x64
+		{196A8F21-53BF-4D20-8955-C60270149292}.Debug|x64.Build.0 = Debug|x64
+		{196A8F21-53BF-4D20-8955-C60270149292}.Debug|x86.ActiveCfg = Debug|Win32
+		{196A8F21-53BF-4D20-8955-C60270149292}.Debug|x86.Build.0 = Debug|Win32
+		{196A8F21-53BF-4D20-8955-C60270149292}.Release|x64.ActiveCfg = Release|x64
+		{196A8F21-53BF-4D20-8955-C60270149292}.Release|x64.Build.0 = Release|x64
+		{196A8F21-53BF-4D20-8955-C60270149292}.Release|x86.ActiveCfg = Release|Win32
+		{196A8F21-53BF-4D20-8955-C60270149292}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6A70F402-31B1-4A6B-B081-51AA1E451754}
+	EndGlobalSection
+EndGlobal
