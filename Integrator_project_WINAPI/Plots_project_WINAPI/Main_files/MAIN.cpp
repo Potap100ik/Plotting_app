@@ -1,5 +1,6 @@
 #pragma comment(lib, "GdiPlus.lib")
-#include "main_header.h"
+#include "../Main_files/STD/stdafx.h"
+#include "../Main_files/STD/Standard.h"
 #define CONSOLE
 
 HINSTANCE hInst;
@@ -7,6 +8,7 @@ TCHAR WidMain_NAME[MAX_LOADSTRING] = _T("MainWindow");
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
+	//делаем консоль видимой для удобства - можно делать cout и дебажить как хочется - откл: закомментить #define CONSOLE
 #ifdef CONSOLE
 	setlocale(LC_ALL, "Rus");
 	FILE* conin = stdin;
@@ -21,13 +23,13 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	setlocale(LC_ALL, "Rus");
 #endif //CONSOLE
 
-	GdiplusStartupInput gdiplusStartupInput;
+	//призыв GDI+
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 	hInst = hInstance;
 
 	WNDCLASS wc{}; 
-
 	wc.hInstance = hInstance;
 	wc.lpszClassName = WidMain_NAME;
 	wc.lpfnWndProc = WinProc; 
@@ -61,6 +63,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 		DispatchMessage(&msg); 
 	}
 
+	//прощание с GDI+
 	Gdiplus::GdiplusShutdown(gdiplusToken);
 	return 0;
 }

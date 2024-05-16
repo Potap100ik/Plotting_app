@@ -1,24 +1,4 @@
-#pragma once
-#include <iostream>
-//#include <stdio.h>
-#include <cmath>
-#include <string.h>
-#include "char_change.h"
-#define DEBUG
-const double M_E = 2.71828182845904523;
-const double M_PI = 3.1415926535897932;
-
-using namespace std;
-
-enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, BRAKET, E, PI, XX };
-
-long double Function_String_to_Double(char* str, double* x, int y);
-int Index_of_smth(char* str);
-int Index_of_smth(char* str, char ch1, char ch2);
-char* StrCut(char* str, double* x, int y, FUNC en);
-char* StrCut(char* str, double* x, int y, int const index, FUNC en);
-void StrCut(char*& str1, char*& str2, int const& index2, int const& size2);
-
+#include "str_to_double.h"
 
 
 void StrCut(char*& str1, char*& str2, int const& index2, int const& size2)
@@ -171,7 +151,7 @@ int Index_of_smth(char* str)
 
 
 // y - знак первого числа в строке
-long double Function_String_to_Double(char* str, double* x, int y = 1)
+long double Function_String_to_Double(char* str, double* x, int y)
 {
 
 
@@ -319,7 +299,7 @@ long double Function_String_to_Double(char* str, double* x, int y = 1)
 	}
 	else if (str[0] == '-')
 	{
-		return (-1)*Function_String_to_Double(str + 1, x);
+		return (-1) * Function_String_to_Double(str + 1, x);
 	}
 	else if (str[0] == 'x') {
 

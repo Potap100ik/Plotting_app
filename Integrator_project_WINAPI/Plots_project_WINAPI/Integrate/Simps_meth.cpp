@@ -1,6 +1,4 @@
-#pragma once
-#include <limits.h>
-
+#include "Simps_meth.h"
 double Simps_method(double a, double b, char* str, long double (*Function_Count)(char*, double*, int))
 {
 	long double r{};

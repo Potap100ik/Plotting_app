@@ -127,23 +127,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="MAIN.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="char_change.h" />
-    <ClInclude Include="Debug_sys.h" />
-    <ClInclude Include="Global_header.h" />
-    <ClInclude Include="Neudachi.h" />
+    <ClInclude Include="Debug_sys\Debug_sys.h" />
+    <ClInclude Include="Debug_sys\Neudachi.h" />
+    <ClInclude Include="Integrate\Simps_meth.h" />
+    <ClInclude Include="Main_files\lib_struct.h" />
+    <ClInclude Include="Main_files\main_header.h" />
+    <ClInclude Include="Main_files\STD\Standard.h" />
+    <ClInclude Include="Main_files\STD\stdafx.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Simps_meth.h" />
-    <ClInclude Include="main_header.h" />
-    <ClInclude Include="str_to_double.h" />
+    <ClInclude Include="Str_to_double\char_change.h" />
+    <ClInclude Include="Str_to_double\str_to_double.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Plots_project_WINAPI.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="5260316_analytics_box_chart_diagram_graph_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Integrate\Simps_meth.cpp" />
+    <ClCompile Include="Main_files\MAIN.cpp" />
+    <ClCompile Include="Main_files\main_functions.cpp" />
+    <ClCompile Include="Main_files\STD\stdafx.cpp" />
+    <ClCompile Include="Main_files\WndProc.cpp" />
+    <ClCompile Include="Str_to_double\char_change.cpp" />
+    <ClCompile Include="Str_to_double\str_to_double.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

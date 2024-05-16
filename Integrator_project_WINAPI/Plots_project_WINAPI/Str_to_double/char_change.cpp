@@ -1,22 +1,14 @@
-#pragma once
 //проверяем некорректные знаки в введенной пользователем функции
-#define MAX_STRLENGTH 100
-#include <stdio.h>
-#define CANSELWORDS "()1234567890*/-+.expabslog10lnpowpisincostan"//то что нельзя удалять, если нашлось в начале строки
-
-
-char* char_to_clear(char* str, char chh);
-char* char_to_swap(char* str, double x, char chh);
-char* char_to_delete(char* str, int index);
-
+#include "char_change.h"
+//#define CANSELWORDS "()1234567890*/-+.expabslog10lnpowpisincostan"//то что нельзя удалять, если нашлось в начале строки
 char* char_to_swap(char* str, double x, char chh)
 {
 
 	char* ch_x = (char*)malloc(sizeof(double));
 	sprintf(ch_x, "%lf", x);
 
-	char* ch = (char*)malloc(MAX_STRLENGTH);
-	char* buf = (char*)malloc(MAX_STRLENGTH);
+	char* ch = (char*)malloc(MAX_LOADSTRING);
+	char* buf = (char*)malloc(MAX_LOADSTRING);
 	while (ch = strchr(str, chh))
 	{
 
@@ -35,8 +27,8 @@ char* char_to_clear(char* str, char chh)
 		return str;
 	}
 
-	char* ch = (char*)malloc(MAX_STRLENGTH);
-	char* buf = (char*)malloc(MAX_STRLENGTH);
+	char* ch = (char*)malloc(MAX_LOADSTRING);
+	char* buf = (char*)malloc(MAX_LOADSTRING);
 	while (ch = strchr(str, chh))
 	{
 		strcpy(buf, ch + 1);
