@@ -4,6 +4,7 @@
 #define CONSOLE
 
 HINSTANCE hInst;
+MyWnd_Plot* Wnd_Plot;
 TCHAR WidMain_NAME[MAX_LOADSTRING] = _T("MainWindow");
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
@@ -28,7 +29,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 	hInst = hInstance;
-
+	Wnd_Plot = (MyWnd_Plot*)malloc(sizeof(Wnd_Plot_struct));
 	WNDCLASS wc{}; 
 	wc.hInstance = hInstance;
 	wc.lpszClassName = WidMain_NAME;

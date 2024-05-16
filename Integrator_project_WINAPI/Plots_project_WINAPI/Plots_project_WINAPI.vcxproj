@@ -134,6 +134,7 @@
     <ClInclude Include="Main_files\main_header.h" />
     <ClInclude Include="Main_files\STD\Standard.h" />
     <ClInclude Include="Main_files\STD\stdafx.h" />
+    <ClInclude Include="Plotting.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Str_to_double\char_change.h" />
     <ClInclude Include="Str_to_double\str_to_double.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Main_files\main_functions.cpp" />
     <ClCompile Include="Main_files\STD\stdafx.cpp" />
     <ClCompile Include="Main_files\WndProc.cpp" />
+    <ClCompile Include="Plotting.cpp" />
     <ClCompile Include="Str_to_double\char_change.cpp" />
     <ClCompile Include="Str_to_double\str_to_double.cpp" />
   </ItemGroup>

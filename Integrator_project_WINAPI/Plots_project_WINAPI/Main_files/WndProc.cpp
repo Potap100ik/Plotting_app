@@ -8,7 +8,9 @@ extern MouseMove MyMouse;
 extern HDC hdc;
 extern double IntegerSum;
 extern HINSTANCE hInst;
-extern MyWnd_Plot Wnd_Plot;
+extern MyWnd_Plot* Wnd_Plot;
+Ploting_struct Myplot{};
+Integral_struct Myintegr{};
 extern HWND
 hWndButton_enter,
 hWndButton_clearPlot,
@@ -159,16 +161,16 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		CreateControls(hWnd);
 		if (!MyRegisterChildClass())
 			MessageBox(NULL, _T("НЕ ВЫШЕЛ ГРАФИК ПОГУЛЯТЬ"), _T("Ошибка"), MB_OK);
-		Wnd_Plot.hWnd = CreateWindow(Win_Plot_NAME, NULL, WS_CHILD | WS_DLGFRAME | WS_VISIBLE, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
-		StructInit();
-		MousePos(FALSE, 0, 0);
+		Wnd_Plot->hWnd = CreateWindow(Win_Plot_NAME, NULL, WS_CHILD | WS_DLGFRAME | WS_VISIBLE, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
+		StructInit(Wnd_Plot, Myplot, Myintegr);
+		MousePos(FALSE, 0, 0, Wnd_Plot);
 		return 0;
 	case WM_SIZE:
-		Wnd_Plot.sx = LOWORD(lParam) - 405;
-		Wnd_Plot.sy = HIWORD(lParam) - 5;
-		MoveWindow(Wnd_Plot.hWnd, 400, 0, Wnd_Plot.sx, Wnd_Plot.sy, 1);
-		Wnd_Plot.setka.sx_center = Wnd_Plot.sx / 2;
-		Wnd_Plot.setka.sy_center = Wnd_Plot.sy / 2;
+		Wnd_Plot->sx = LOWORD(lParam) - 405;
+		Wnd_Plot->sy = HIWORD(lParam) - 5;
+		MoveWindow(Wnd_Plot->hWnd, 400, 0, Wnd_Plot->sx, Wnd_Plot->sy, 1);
+		Wnd_Plot->setka.sx_center = Wnd_Plot->sx / 2;
+		Wnd_Plot->setka.sy_center = Wnd_Plot->sy / 2;
 		return 0;
 
 	case WM_COMMAND:
@@ -185,24 +187,24 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			text.reserve(MAX_LOADSTRING);
 			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
 			text.erase(remove(text.begin(), text.end(), 0), text.end());
-			Wnd_Plot.text_ = Wide_into_Ascii(text.c_str());
-			if (strlen(Wnd_Plot.text_) == 0)
+			Wnd_Plot->text_ = Wide_into_Ascii(text.c_str());
+			if (strlen(Wnd_Plot->text_) == 0)
 			{
 				MessageBox(hWnd, L"Уважаемый прогер\nГде ваша функция?", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
 				return 0;
 			}
 
-			Plotting_edges_upd(2);
-			FirstPlotting();
-			UpdateWindow(Wnd_Plot.hWnd);
-			InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
+			Plotting_edges_upd(2, Wnd_Plot, Myplot);
+			FirstPlotting(Wnd_Plot, Myplot);
+			UpdateWindow(Wnd_Plot->hWnd);
+			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 
 			return 0;
 		case	HWNDBUTTON_CLEARPLOT:
-			Wnd_Plot.plot.myvec_xy_picsel.clear();
-			Wnd_Plot.plot.myvec_xy.clear();
-			Wnd_Plot.text_ = (LPSTR)"";
-			InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
+			Myplot.picsel.clear();
+			Myplot.myvec_xy.clear();
+			Wnd_Plot->text_ = (LPSTR)"";
+			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 			return 0;
 		case HWNDBUTTON_INTEGER:
 		{
@@ -217,12 +219,12 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			GetWindowText(hWndEdit_B, &Bstr[0], MAX_LOADSTRING);
 			GetWindowText(hWndEdit_H, &Hstr[0], MAX_LOADSTRING);
 			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
-			Wnd_Plot.text_ = Wide_into_Ascii(text.c_str());
+			Wnd_Plot->text_ = Wide_into_Ascii(text.c_str());
 			try
 			{
-				Wnd_Plot.plot.A = std::stod(Astr);
-				Wnd_Plot.plot.B = std::stod(Bstr);
-				Wnd_Plot.plot.H = std::stod(Hstr);
+				Myintegr.A = std::stod(Astr);
+				Myintegr.B = std::stod(Bstr);
+				Myintegr.H = std::stod(Hstr);
 			}
 			catch (...)
 			{
@@ -231,25 +233,25 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 				return 0;
 			}
 			Astr.clear(); Bstr.clear(); Hstr.clear(); text.clear();
-			if (Wnd_Plot.plot.A == Wnd_Plot.plot.B || Wnd_Plot.plot.H == 0)
+			if (Myintegr.A == Myintegr.B || Myintegr.H == 0)
 			{
 				SetWindowText(hWndEdit_Integral, L"Интеграл равен нулю");
 				return 0;
 			}
-			if (Wnd_Plot.plot.A > Wnd_Plot.plot.B || Wnd_Plot.plot.H == 0 || Wnd_Plot.plot.H > (Wnd_Plot.plot.B - Wnd_Plot.plot.A))
+			if (Myintegr.A > Myintegr.B || Myintegr.H == 0 || Myintegr.H > (Myintegr.B - Myintegr.A))
 			{
 				MessageBox(hWnd, L"Уважаемый прогер\nВ числах беспорядки!!!\nИз чего интегралы строить", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
 				SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
 				return 0;
 			}
-			if (strlen(Wnd_Plot.text_) == 0)
+			if (strlen(Wnd_Plot->text_) == 0)
 			{
 				MessageBox(hWnd, L"Уважаемый прогер\nГде ваша функция?", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
 				SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
 				return 0;
 			}
 			try {
-				IntegerSum = Integrator(Wnd_Plot.plot.A, Wnd_Plot.plot.B, Wnd_Plot.plot.H, Wnd_Plot.text_, Function_String_to_Double, Simps_method);
+				IntegerSum = Integrator(Myintegr.A, Myintegr.B, Myintegr.H, Wnd_Plot->text_, Function_String_to_Double, Simps_method);
 			}
 			catch (double error_nan)
 			{
@@ -264,17 +266,17 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		}
 		return 0;
 		case HWNDBUTTON_HOME:
-			Wnd_Plot.setka.sx_center = Wnd_Plot.sx / 2;
-			Wnd_Plot.setka.sy_center = Wnd_Plot.sy / 2;
-			Wnd_Plot.setka.h_setka = 10;
-			Wnd_Plot.setka.u5_setka = 2;
-			Wnd_Plot.setka.mantissa = 1;
-			Wnd_Plot.setka.h5_setka = Wnd_Plot.setka.h_setka * 5;
-			Wnd_Plot.setka.kxy_zoom = Wnd_Plot.setka.h5_setka / Wnd_Plot.setka.u5_setka;
-			Wnd_Plot.setka.unit_to_pixel = 1.0 / Wnd_Plot.setka.kxy_zoom;
-			Plotting_edges_upd(2);
-			RedrawPlot();
-			InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
+			Wnd_Plot->setka.sx_center = Wnd_Plot->sx / 2;
+			Wnd_Plot->setka.sy_center = Wnd_Plot->sy / 2;
+			Wnd_Plot->setka.h_setka = 10;
+			Wnd_Plot->setka.u5_setka = 2;
+			Wnd_Plot->setka.mantissa = 1;
+			Wnd_Plot->setka.h5_setka = Wnd_Plot->setka.h_setka * 5;
+			Wnd_Plot->setka.kxy_zoom = Wnd_Plot->setka.h5_setka / Wnd_Plot->setka.u5_setka;
+			Wnd_Plot->setka.unit_to_pixel = 1.0 / Wnd_Plot->setka.kxy_zoom;
+			Plotting_edges_upd(2, Wnd_Plot, Myplot);
+			RedrawPlot(Wnd_Plot, Myplot);
+			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 			return 0;
 		}
 		return 0;
@@ -304,7 +306,7 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	case WM_CREATE:
 		return 0;
 	case WM_LBUTTONDOWN:
-		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam));
+		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam), Wnd_Plot);
 		return 0;
 	case WM_MOUSEMOVE:
 		if (MyMouse.Flag_for_mouse)
@@ -312,21 +314,21 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			int x = LOWORD(lParam);
 			int y = HIWORD(lParam);
 
-			Wnd_Plot.setka.sx_center += x - MyMouse.Prev_mouse_point.x;
-			Wnd_Plot.setka.sy_center += y - MyMouse.Prev_mouse_point.y;
+			Wnd_Plot->setka.sx_center += x - MyMouse.Prev_mouse_point.x;
+			Wnd_Plot->setka.sy_center += y - MyMouse.Prev_mouse_point.y;
 
 			MyMouse.Prev_mouse_point.x = x;
 			MyMouse.Prev_mouse_point.y = y;
 
-			Plotting_edges_upd(2);
-			if (Wnd_Plot.setka.LLeft < Wnd_Plot.setka.Left_Wide_Vec || Wnd_Plot.setka.RRight > Wnd_Plot.setka.Right_Wide_Vec)
+			Plotting_edges_upd(2, Wnd_Plot, Myplot);
+			if (Wnd_Plot->setka.LLeft < Wnd_Plot->setka.Left_Wide_Vec || Wnd_Plot->setka.RRight > Wnd_Plot->setka.Right_Wide_Vec)
 			{
-				Wnd_Plot.setka.Left_Wide_Vec = Wnd_Plot.setka.LLeft - (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
-				Wnd_Plot.setka.Right_Wide_Vec = Wnd_Plot.setka.LLeft + (Wnd_Plot.setka.Wide_Vec / 2 - 1000) * Wnd_Plot.setka.unit_to_pixel;
-				RedrawPlot();
+				Wnd_Plot->setka.Left_Wide_Vec = Wnd_Plot->setka.LLeft - (Wnd_Plot->setka.Wide_Vec / 2 - 1000) * Wnd_Plot->setka.unit_to_pixel;
+				Wnd_Plot->setka.Right_Wide_Vec = Wnd_Plot->setka.LLeft + (Wnd_Plot->setka.Wide_Vec / 2 - 1000) * Wnd_Plot->setka.unit_to_pixel;
+				RedrawPlot(Wnd_Plot, Myplot);
 			}
 
-			InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
+			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 		}
 		return 0;
 	case WM_LBUTTONUP:
@@ -343,49 +345,49 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		return 0;
 	case WM_MOUSEWHEEL:
 	{
-		int a = Wnd_Plot.setka.h_setka;
-		Wnd_Plot.setka.h_setka += GET_WHEEL_DELTA_WPARAM(wParam) / 120;
+		int a = Wnd_Plot->setka.h_setka;
+		Wnd_Plot->setka.h_setka += GET_WHEEL_DELTA_WPARAM(wParam) / 120;
 		/*{
-			if (Wnd_Plot.setka.sx_center > Wnd_Plot.sx / 2)
-				Wnd_Plot.setka.sx_center += GET_WHEEL_DELTA_WPARAM(wParam);
-			else if (Wnd_Plot.setka.sx_center == Wnd_Plot.sx / 2) {}
+			if (Wnd_Plot->setka.sx_center > Wnd_Plot->sx / 2)
+				Wnd_Plot->setka.sx_center += GET_WHEEL_DELTA_WPARAM(wParam);
+			else if (Wnd_Plot->setka.sx_center == Wnd_Plot->sx / 2) {}
 			else
-				Wnd_Plot.setka.sx_center -= GET_WHEEL_DELTA_WPARAM(wParam);
+				Wnd_Plot->setka.sx_center -= GET_WHEEL_DELTA_WPARAM(wParam);
 
-			if (Wnd_Plot.setka.sy_center > Wnd_Plot.sy / 2)
-				Wnd_Plot.setka.sy_center += GET_WHEEL_DELTA_WPARAM(wParam);
-			else if (Wnd_Plot.setka.sy_center == Wnd_Plot.sy / 2) {}
+			if (Wnd_Plot->setka.sy_center > Wnd_Plot->sy / 2)
+				Wnd_Plot->setka.sy_center += GET_WHEEL_DELTA_WPARAM(wParam);
+			else if (Wnd_Plot->setka.sy_center == Wnd_Plot->sy / 2) {}
 			else
-				Wnd_Plot.setka.sy_center -= GET_WHEEL_DELTA_WPARAM(wParam);
+				Wnd_Plot->setka.sy_center -= GET_WHEEL_DELTA_WPARAM(wParam);
 		}*/
-		CorrectSetkaPos(0);
-		InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE);
+		CorrectSetkaPos(0, Wnd_Plot, Myplot);
+		InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 	}
 	return 0;
 	case WM_SIZE:
-		Wnd_Plot.sx = LOWORD(lParam);
-		Wnd_Plot.sy = HIWORD(lParam);
+		Wnd_Plot->sx = LOWORD(lParam);
+		Wnd_Plot->sy = HIWORD(lParam);
 		return 0;
 	case WM_ERASEBKGND:
 		return 1;
 	case WM_PAINT:
 	{
 		SimpleTimer timer;
-		hdc2 = BeginPaint(Wnd_Plot.hWnd, &ps2);
+		hdc2 = BeginPaint(Wnd_Plot->hWnd, &ps2);
 		memdc = CreateCompatibleDC(hdc2);
-		membit = CreateCompatibleBitmap(hdc2, Wnd_Plot.sx, Wnd_Plot.sy);
+		membit = CreateCompatibleBitmap(hdc2, Wnd_Plot->sx, Wnd_Plot->sy);
 		SelectObject(memdc, membit);
-		DrowSetka(memdc);
-		DrowCounts(memdc);
-		if (!Wnd_Plot.plot.myvec_xy_picsel.empty())
+		DrowSetka(memdc, Wnd_Plot, Myplot);
+		DrowCounts(memdc, Wnd_Plot, Myplot);
+		if (!Myplot.picsel.empty())
 		{
-			DrowGraphSmooth(memdc);
-			//DrowGraph(memdc);оставим для экспериментов - рисование без GDI+
+			DrowGraphSmooth(memdc, Wnd_Plot, Myplot);
+			//DrowGraph(memdc, Wnd_Plot);оставим для экспериментов - рисование без GDI+
 		}
-		BitBlt(hdc2, 0, 0, Wnd_Plot.sx * 2, Wnd_Plot.sy * 2, memdc, 0, 0, SRCCOPY);
+		BitBlt(hdc2, 0, 0, Wnd_Plot->sx * 2, Wnd_Plot->sy * 2, memdc, 0, 0, SRCCOPY);
 		DeleteDC(memdc);
 		DeleteObject(membit);
-		EndPaint(Wnd_Plot.hWnd, &ps2);
+		EndPaint(Wnd_Plot->hWnd, &ps2);
 	}
 	return 0;
 	case WM_DESTROY:

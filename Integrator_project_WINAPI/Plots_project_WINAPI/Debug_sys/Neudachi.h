@@ -8,7 +8,7 @@
 100 лет прошло. а с помощью стандартного GDI картинки и иконки так и не выводятся
 -------
 ну вот, года не прошло и появилась синкхронизация с гитом - ураааа
-------- DrawLine(a,x1,y,x2,y2) DrawLine(a,x1 + Wnd_Plot.setka.sx_center,y*(-1) + Wnd_Plot.setka.sy_center,x2 + Wnd_Plot.setka.sx_center,y2*(-1) + Wnd_Plot.setka.sy_center)
+------- DrawLine(a,x1,y,x2,y2) DrawLine(a,x1 + Wnd_Plot->setka.sx_center,y*(-1) + Wnd_Plot->setka.sy_center,x2 + Wnd_Plot->setka.sx_center,y2*(-1) + Wnd_Plot->setka.sy_center)
 это понималось очень долго в отношении moveto и lineto - надо было всего то поставить скобки внутри функций - и все бы заработало
 textout - дефайны системы заменяют  сам текстаут на textoutW поэтому с этим дефайном тыкался не меньше полутора часов (и откуда у меня столько времени)
 //КОСТЫЛИ ДЛЯ DEFINE - НУ УСТАЛ Я ИСКАТЬ КАК С ЭТИМ БОРОТЬСЯ -- 2 ЧАСА ушло на понимание того, что чтоб сработал макрос, надо поставить скобочки
@@ -27,8 +27,8 @@ std::wstring text;//ошибка считывания GetWindowText при вводе log(x)+tan(x)
 проверка строки на пустоту еше не решена - длина строки всегда РАВНА нулю - всегда, даже когда отладка НЕ показывает в переменной "" 
 то ::wstrint.size() показывает чепуху  ::wstrint.empty() тоже 
 -------
-			//Wnd_Plot.plot.myvec_xy_picsel.reserve((int)(Wnd_Plot.setka.Br - Wnd_Plot.setka.Ar) / Wnd_Plot.setka.Hr + 1);//+1 - а оно вообше надо?
-			//Wnd_Plot.plot.myvec_xy.reserve((int)(Wnd_Plot.setka.Br - Wnd_Plot.setka.Ar) / Wnd_Plot.setka.Hr + 1);//+1 - а оно вообше надо?
+			//Myplot.myvec_xy_picsel.reserve((int)(Wnd_Plot->setka.Br - Wnd_Plot->setka.Ar) / Wnd_Plot->setka.Hr + 1);//+1 - а оно вообше надо?
+			//Myplot.myvec_xy.reserve((int)(Wnd_Plot->setka.Br - Wnd_Plot->setka.Ar) / Wnd_Plot->setka.Hr + 1);//+1 - а оно вообше надо?
 -------
 //MessageBox(NULL, L"Нельзя так числа вводить!", L"Информация", MB_ICONINFORMATION | MB_OK);
 MessageBox какого-то хера не показывается сам - надо ткнуть ctrl или выйти и зайти в окно - потом он выскакивает на передний план
@@ -36,9 +36,9 @@ MessageBox какого-то хера не показывается сам - надо ткнуть ctrl или выйти и зай
 void transform(HDC hdc)
 {
 	SetMapMode(hdc, MM_ANISOTROPIC);
-	SetWindowExtEx(hdc, Wnd_Plot.sx, -Wnd_Plot.sy, NULL);//установка  логические размеры - в пикселах - влияет на размеры текста и проч "писельные" переменные
-	SetViewportExtEx(hdc, Wnd_Plot.sx, Wnd_Plot.sy, NULL);//ОБЛАСТЬ ВЫВОДА  -  физические размеры области вывода в пикселах
-	SetViewportOrgEx(hdc, Wnd_Plot.setka.sx_center, Wnd_Plot.setka.sy_center, NULL);
+	SetWindowExtEx(hdc, Wnd_Plot->sx, -Wnd_Plot->sy, NULL);//установка  логические размеры - в пикселах - влияет на размеры текста и проч "писельные" переменные
+	SetViewportExtEx(hdc, Wnd_Plot->sx, Wnd_Plot->sy, NULL);//ОБЛАСТЬ ВЫВОДА  -  физические размеры области вывода в пикселах
+	SetViewportOrgEx(hdc, Wnd_Plot->setka.sx_center, Wnd_Plot->setka.sy_center, NULL);
 }
 не хочет эта шняга нормально работать, придется самому костыли делать для перевода систем координат 
 -------
@@ -69,10 +69,10 @@ break; - он должен быть после операторов моего избранного case, а не перед ними 
 		//str = std::to_wstring(countpaint);
 		//
 		//str += L"\nWnd_Plot.setka.sy_center: ";
-		//str += std::to_wstring(Wnd_Plot.setka.sy_center);
+		//str += std::to_wstring(Wnd_Plot->setka.sy_center);
 		//str += L"\nWnd_Plot.sy: ";
-		//str += std::to_wstring(Wnd_Plot.sy);
-		//if (Wnd_Plot.setka.sy_center < 50)
+		//str += std::to_wstring(Wnd_Plot->sy);
+		//if (Wnd_Plot->setka.sy_center < 50)
 		//{
 		//	str += L"\nWOWOWOWOWOOWOWOWWOWOOWOWOWooooooo ";
 		//}
@@ -91,7 +91,7 @@ break; - он должен быть после операторов моего избранного case, а не перед ними 
 -------
 с обработками бесконечностей и бесконечных несоответствий типов данных в throw, try-catch разобрались
 -------
-пора бы и понять  почему InvalidateRect(Wnd_Plot.hWnd, NULL, TRUE); не хочет перерисовывать окно когда я создаю график. 
+пора бы и понять  почему InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE); не хочет перерисовывать окно когда я создаю график. 
 
 
 

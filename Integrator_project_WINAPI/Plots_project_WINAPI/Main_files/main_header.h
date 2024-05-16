@@ -1,6 +1,7 @@
 #pragma once
-#include "stdafx.h"
-#include "Standard.h"
+#include "lib_struct.h"
+#include "STD/stdafx.h"
+#include "STD/Standard.h"
 
 //оконные создания
 LPVOID CreateControls(HWND hWnd);
@@ -9,22 +10,14 @@ ATOM MyRegisterChildClass();
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
 LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
 //исполнительные функции
-void Plotting_edges_upd(int);
+void Plotting_edges_upd(int, MyWnd_Plot*, Ploting_struct&);
 double Setka_unit(double get_value);//придвигает кратность юнита сетки графика к 1,2 или 5
 LPSTR Wide_into_Ascii(LPCWSTR sw);
-void StructInit();
-void CorrectSetkaPos(int);
-void MousePos(BOOL, int, int);
-void DrowSetka(HDC hdc);
-void DrowCounts(HDC hdc);
-void DrowGraphSmooth(HDC hdc);
-void DrowGraph(HDC hdc);
-void FirstPlotting();
-void RedrawPlot();
-
-
-//TCHAR WidMain_NAME[MAX_LOADSTRING] = _T("MainWindow");
-//HINSTANCE hInst;
+void StructInit(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot, Integral_struct Myintegr);
+void CorrectSetkaPos(int, MyWnd_Plot*, Ploting_struct&);
+void MousePos(BOOL, int, int, MyWnd_Plot*);
+void FirstPlotting(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
+void RedrawPlot(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
 
 
 //оконные процедуры

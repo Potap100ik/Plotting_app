@@ -6,3 +6,4 @@
 #include "../../Str_to_double/str_to_double.h"
 #include "../../Str_to_double/char_change.h"
 #include "../../Integrate/Simps_meth.h"
+#include "../../Plotting.h"

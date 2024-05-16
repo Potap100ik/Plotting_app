@@ -1,7 +1,7 @@
 #pragma once
-#define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot.setka.sx_center, y*(-1) + Wnd_Plot.setka.sy_center, d);
-#define LineTo(a, x, y); LineTo(a, x + Wnd_Plot.setka.sx_center, y*(-1) + Wnd_Plot.setka.sy_center);
-#define TextOutW(dc, x, y, s, st); TextOutW(dc, x + Wnd_Plot.setka.sx_center, y*(-1) + Wnd_Plot.setka.sy_center, s, st);
+#define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, d);
+#define LineTo(a, x, y); LineTo(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center);
+#define TextOutW(dc, x, y, s, st); TextOutW(dc, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, s, st);
 //константы
 #define MAX_LOADSTRING 100
 #define edit_otst1 60
@@ -23,14 +23,17 @@ struct Pointer {
 struct Pointer_lng_double {
 	long double x, y;
 };
-typedef struct Plot {
-	std::vector<Pointer> myvec_xy_picsel{};//вектор хранит пиксельные координаты x,y 
-	std::vector<Pointer> myvec_xy{};//вектор хранит реальные координаты x,y для каждой точки графика
-	double A, B, H;//получаемые из окна границы графика
+typedef struct Ploting_struct {
+	std::vector<Pointer> picsel;//вектор хранит пиксельные координаты x,y 
+	std::vector<Pointer> myvec_xy;//вектор хранит реальные координаты x,y для каждой точки графика
+	//double A, B, H;//получаемые из окна границы графика
 	//double C;//
-
-
-}MyPlot;
+};
+typedef struct Integral_struct {
+	Ploting_struct vec;
+	Ploting_struct integral_plot;
+	double A, B, H;//получаемые из окна границы графика
+};
 typedef struct Setka {
 	int sx_center, sy_center;
 	double LLeft, RRight, TTop, BBottom, u_HHH;
@@ -43,7 +46,7 @@ typedef struct Setka {
 }MySetka;
 typedef struct Wnd_Plot_struct {
 	HWND hWnd;
-	MyPlot plot;
+	//MyPlot plot;
 	MySetka setka;
 	int sx, sy;//размеры текушщего окна
 	//КООРДИНАТЫ КРАЕВ
