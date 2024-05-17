@@ -129,11 +129,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Integrator_project_WINAPI\Plots_project_WINAPI\Str_to_double\char_change.cpp" />
+    <ClCompile Include="..\..\Integrator_project_WINAPI\Plots_project_WINAPI\Str_to_double\str_to_double.cpp" />
     <ClCompile Include="main_counter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Integrator_project_WINAPI\Plots_project_WINAPI\char_change.h" />
-    <ClInclude Include="..\..\Integrator_project_WINAPI\Plots_project_WINAPI\str_to_double.h" />
+    <ClInclude Include="..\..\Integrator_project_WINAPI\Plots_project_WINAPI\Str_to_double\char_change.h" />
+    <ClInclude Include="..\..\Integrator_project_WINAPI\Plots_project_WINAPI\Str_to_double\str_to_double.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

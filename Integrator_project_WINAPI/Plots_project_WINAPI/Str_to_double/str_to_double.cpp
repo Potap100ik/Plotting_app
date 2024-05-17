@@ -63,10 +63,11 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипуляц
 		throw(nani);
 		//throw(str1);
 	}
-	memcpy(str1 + strlen(str1), str + index, strlen(str) - index + 1);
+	memcpy(str1 + strlen(str1), str + index + 1, strlen(str) - index);
+	//memcpy(str1 + strlen(str1), str + index, strlen(str) - index + 1); //ошибка при вызове (2+2)*2
 	//str1 + strlen(str1)		- индекс элемента '\0', следующего за основной записью 
-	//str + index				- индекс начала чтения послескобочной записи
-	//strlen(str) - index = 1	- количество послескобочной записи, включая '\0'
+	//str + index + 1 			- индекс начала чтения послескобочной записи
+	//strlen(str) - index = 	- количество послескобочной записи, включая '\0'
 	delete[] str2;
 	return str1;
 }
@@ -89,6 +90,68 @@ char* StrCut(char* str, double* x, int y, FUNC en) {//манипуляции с выражением в
 	}
 	strcat(str1, str);
 	return str1;
+}
+int Index_of_smth(char* str, char ch1, char ch2, char ch3, char ch4)
+{
+	int count = 0;
+	char ch = str[0];
+	int index2 = 0;
+	int i = 0;//потому что нулевой знак - порверен
+	while (ch != '\0')
+	{
+		ch = str[i];
+
+		if (ch == ch1 || ch == ch2 || ch == ch3 || ch == ch4)//найден ПЕРВЫЙ нужный знак +- или */
+		{
+			if (count == 0)//в нашей дериктории
+			{
+				index2 = i;//запомни индекс вхождения знака
+				ch = '\0';//выходи из цикла
+			}
+		}
+		else if (ch == '(')//повышение уровня дериктории
+		{
+			count++;
+		}
+		else if (ch == ')')//понижение уровня дериктории
+		{
+			count--;
+		}
+		i++;
+
+	}
+	return index2;
+}
+int Index_of_smth(char* str, char ch1, char ch2, char ch3)
+{
+	int count = 0;
+	char ch = str[0];
+	int index2 = 0;
+	int i = 0;//потому что нулевой знак - порверен
+	while (ch != '\0')
+	{
+		ch = str[i];
+
+		if (ch == ch1 || ch == ch2 || ch == ch3)//найден ПЕРВЫЙ нужный знак +- или */
+		{
+			if (count == 0)//в нашей дериктории
+			{
+				index2 = i;//запомни индекс вхождения знака
+				ch = '\0';//выходи из цикла
+			}
+		}
+		else if (ch == '(')//повышение уровня дериктории
+		{
+			count++;
+		}
+		else if (ch == ')')//понижение уровня дериктории
+		{
+			count--;
+		}
+		i++;
+
+	}
+	return index2;
 }
 int Index_of_smth(char* str, char ch1, char ch2)
 {
@@ -158,7 +221,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 	if (strcspn(str, "1234567890") == 0)//если первый знак строки - число
 	{
 		int size = strlen(str);
-		int index = strcspn(str, "*+-/");
+		int index = strcspn(str, "*+-/^");
 		if (size == index) {//если в строке НЕ найден знак умножения, деления, сложения или вычитания
 			return y * atof(str);//данная строка состоит из цифр и является числом - мы нашли наименьшее реккурсивное звено
 		}
@@ -174,6 +237,36 @@ long double Function_String_to_Double(char* str, double* x, int y)
 
 			switch (str[index])
 			{
+			case '^':
+			{
+				int size2 = strlen(str2); //измеряем длину строки 2
+
+				//ищем знаки +  и  -
+				//ищем знаки лишь в нашей директории, в чужие скобки не лезем
+
+
+				int index2 = Index_of_smth(str2, '+', '-', '*', '/');
+				if (index2 != 0) {//если в строке 2 найдены знаки  сложения или вычитания - надо расставить приоритеты для математических операций
+
+					double d = y * atof(str1);
+					char ch = str2[index2];//сохраняем найденный знак
+					StrCut(str1, str2, index2, size2);//отделяем строку 1 от str2 и помещаем остатки в str2 с исключением знака */
+
+					switch (ch)
+					{
+					case '+': return pow(d, Function_String_to_Double(str1, x)) + Function_String_to_Double(str2, x);
+					case '-': return pow(d, Function_String_to_Double(str1, x)) - Function_String_to_Double(str2, x);
+					case '*': return pow(d, Function_String_to_Double(str1, x)) * Function_String_to_Double(str2, x);
+					case '/': return pow(d, Function_String_to_Double(str1, x)) / Function_String_to_Double(str2, x);
+					}
+					//Function_Count(str1, x) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
+					//Function_Count(str2, x) - выражение 2, которое высчитывается отдельно
+				}
+				else
+				{
+					return pow(y * atof(str1), Function_String_to_Double(str2, x));
+				}
+			}
 			case '*':
 			{
 				int size2 = strlen(str2); //измеряем длину строки 2
@@ -229,7 +322,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 			case '+':
 			{
 				int size2 = strlen(str2); //измеряем длину строки 2
-				int index2 = Index_of_smth(str2, '*', '/');
+				int index2 = Index_of_smth(str2, '*', '/', '^');
 				if (index2 != 0) {//если в строке 2 найдены знаки  умножения и деления - надо расставить приоритеты для математических операций
 
 					double d = y * atof(str1);
@@ -240,6 +333,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 					{
 					case '*': return d + (Function_String_to_Double(str1, x) * Function_String_to_Double(str2, x));
 					case '/': return d + (Function_String_to_Double(str1, x) / Function_String_to_Double(str2, x));
+					case '^': return d + pow(Function_String_to_Double(str1, x), Function_String_to_Double(str2, x));
 					}
 					//Function_Count(str1) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
 					//Function_Count(str2) - выражение 2, которое высчитывается отдельно
@@ -253,7 +347,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 			case '-':
 			{
 				int size2 = strlen(str2); //измеряем длину строки 2
-				int index2 = Index_of_smth(str2, '*', '/');
+				int index2 = Index_of_smth(str2, '*', '/', '^');
 				if (index2 != 0) {//если в строке 2 найдены знаки  умножения и деления - надо расставить приоритеты для математических операций
 
 					double d = y * atof(str1);
@@ -264,6 +358,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 					{
 					case '*': return d - (Function_String_to_Double(str1, x) * Function_String_to_Double(str2, x));
 					case '/': return d - (Function_String_to_Double(str1, x) / Function_String_to_Double(str2, x));
+					case '^': return d - pow(Function_String_to_Double(str1, x) , Function_String_to_Double(str2, x));
 					}
 					//Function_Count(str1) - выражение 1, на которое надо умножить или разделить d перед тем как складывать или вычитать выражение 2
 					//Function_Count(str2) - выражение 2, которое высчитывается отдельно
@@ -299,7 +394,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 	}
 	else if (str[0] == '-')
 	{
-		return (-1) * Function_String_to_Double(str + 1, x);
+		return Function_String_to_Double(str + 1, x, -1);
 	}
 	else if (str[0] == 'x') {
 

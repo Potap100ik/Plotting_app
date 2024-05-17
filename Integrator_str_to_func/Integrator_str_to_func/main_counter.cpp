@@ -1,7 +1,7 @@
 //#include <iostream>
 //#include <stdio.h>
-#include "..\\..\\Integrator_project_WINAPI\\Plots_project_WINAPI\\str_to_double.h"
-#include "..\\..\\Integrator_project_WINAPI\\Plots_project_WINAPI\\char_change.h"
+#include "..\\..\\Integrator_project_WINAPI\\Plots_project_WINAPI\\Str_to_double\\str_to_double.h"
+#include "..\\..\\Integrator_project_WINAPI\\Plots_project_WINAPI\\Str_to_double\\char_change.h"
 //#include "X_change.h"
 using namespace std;
 

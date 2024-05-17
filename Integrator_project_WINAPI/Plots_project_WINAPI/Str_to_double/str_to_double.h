@@ -17,6 +17,8 @@ enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, BRAKET, E, PI, XX };
 long double Function_String_to_Double(char* str, double* x, int y = 1);
 int Index_of_smth(char* str);
 int Index_of_smth(char* str, char ch1, char ch2);
+int Index_of_smth(char* str, char ch1, char ch2, char ch3);
+int Index_of_smth(char* str, char ch1, char ch2, char ch3, char ch4);
 char* StrCut(char* str, double* x, int y, FUNC en);
 char* StrCut(char* str, double* x, int y, int const index, FUNC en);
 void StrCut(char*& str1, char*& str2, int const& index2, int const& size2);

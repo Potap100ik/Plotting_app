@@ -2,29 +2,35 @@
 #include "../Main_files/STD/Standard.h"
 
 TCHAR Win_Plot_NAME[MAX_LOADSTRING] = _T("PlotWindow");
+TCHAR Integral_Wnd_NAME[MAX_LOADSTRING] = _T("Integral_Wnd");
+
+
 
 //extern - так делать нельзя, но я по-другому пока не умею
-extern MouseMove MyMouse;
-extern HDC hdc;
-extern double IntegerSum;
 extern HINSTANCE hInst;
-extern MyWnd_Plot* Wnd_Plot;
+MouseMove MyMouse;//
+HDC hdc;
+MyWnd_Plot* Wnd_Plot{};
 Ploting_struct Myplot{};
 Integral_struct Myintegr{};
-extern HWND
-hWndButton_enter,
-hWndButton_clearPlot,
-hWndButton_clearEdit,
-hWndButton_home,
-hWndEdit_base,
-hWndEdit_A,
-hWndEdit_B,
-hWndEdit_H,
-hWndEdit_Integral;
 
+HWND
+hWndButton_enter{},
+hWndButton_clearPlot{},
+hWndButton_clearEdit{},
+hWndButton_home{},
+hWndEdit_base{},
+hWndEdit_A{},
+hWndEdit_B{},
+hWndEdit_H{},
+hWndEdit_Integral{},
+hWnd_Integer_Wnd{};
 
 LPVOID CreateControls(HWND hWnd)
 {
+	
+
+
 	hWndButton_enter = CreateWindowEx(
 		0,
 		L"BUTTON",
@@ -135,6 +141,20 @@ LPVOID CreateControls(HWND hWnd)
 		MessageBox(NULL, _T("hWndEdit_H"), _T("Ошибка"), MB_OK);
 	return 0;
 }
+
+
+ATOM Register_Integer_Wnd_Class()
+{
+	WNDCLASSEX wcex{};
+	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.style = CS_HREDRAW | CS_VREDRAW; // Стиль окна
+	wcex.lpszClassName = Integral_Wnd_NAME;
+	wcex.lpfnWndProc = Integral_Wnd_Proc;
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.hInstance = hInst;
+	return RegisterClassEx(&wcex);
+}
 ATOM MyRegisterChildClass()
 {
 	WNDCLASSEX wcex{};
@@ -158,12 +178,15 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	switch (message)
 	{
 	case WM_CREATE:
+		Wnd_Plot = (MyWnd_Plot*)malloc(sizeof(Wnd_Plot_struct));
 		CreateControls(hWnd);
 		if (!MyRegisterChildClass())
 			MessageBox(NULL, _T("НЕ ВЫШЕЛ ГРАФИК ПОГУЛЯТЬ"), _T("Ошибка"), MB_OK);
+		if (!Register_Integer_Wnd_Class())
+			MessageBox(NULL, _T("НЕ ВЫШЕЛ ПУШНЫЙ ГРАФИК ПОГУЛЯТЬ"), _T("Ошибка"), MB_OK);
 		Wnd_Plot->hWnd = CreateWindow(Win_Plot_NAME, NULL, WS_CHILD | WS_DLGFRAME | WS_VISIBLE, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
 		StructInit(Wnd_Plot, Myplot, Myintegr);
-		MousePos(FALSE, 0, 0, Wnd_Plot);
+		MousePos(FALSE, 0, 0, Wnd_Plot,MyMouse);
 		return 0;
 	case WM_SIZE:
 		Wnd_Plot->sx = LOWORD(lParam) - 405;
@@ -182,7 +205,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			SendMessage(hWnd, WM_COMMAND, HWNDBUTTON_ENTER, NULL);
 			return 0;
 		case HWNDBUTTON_ENTER:
-
+			Wnd_Plot->Draw_way = SIMPLE_PLOTTING;
 			text.clear();
 			text.reserve(MAX_LOADSTRING);
 			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
@@ -194,7 +217,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 				return 0;
 			}
 
-			Plotting_edges_upd(2, Wnd_Plot, Myplot);
+			Plotting_edges_upd(2, Wnd_Plot);
 			FirstPlotting(Wnd_Plot, Myplot);
 			UpdateWindow(Wnd_Plot->hWnd);
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
@@ -208,6 +231,9 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			return 0;
 		case HWNDBUTTON_INTEGER:
 		{
+			
+
+			Wnd_Plot->Draw_way = DRAW_INTEGRAL;
 			std::wstring Astr, Bstr, Hstr;
 			text.clear();
 			Astr.reserve(MAX_LOADSTRING);
@@ -233,36 +259,32 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 				return 0;
 			}
 			Astr.clear(); Bstr.clear(); Hstr.clear(); text.clear();
-			if (Myintegr.A == Myintegr.B || Myintegr.H == 0)
-			{
-				SetWindowText(hWndEdit_Integral, L"Интеграл равен нулю");
+			if (CheckValues_of_edit(Myintegr.A, Myintegr.B, Myintegr.H, hWnd, hWndEdit_Integral, Wnd_Plot))
 				return 0;
-			}
-			if (Myintegr.A > Myintegr.B || Myintegr.H == 0 || Myintegr.H > (Myintegr.B - Myintegr.A))
-			{
-				MessageBox(hWnd, L"Уважаемый прогер\nВ числах беспорядки!!!\nИз чего интегралы строить", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
-				SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
-				return 0;
-			}
-			if (strlen(Wnd_Plot->text_) == 0)
-			{
-				MessageBox(hWnd, L"Уважаемый прогер\nГде ваша функция?", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
-				SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
-				return 0;
-			}
-			try {
-				IntegerSum = Integrator(Myintegr.A, Myintegr.B, Myintegr.H, Wnd_Plot->text_, Function_String_to_Double, Simps_method);
-			}
-			catch (double error_nan)
-			{
-
-				if (isinf(error_nan) || isnan(error_nan))
-					SetWindowText(hWndEdit_Integral, L"Надо отрезок понепрерывнее");
-				else
-					SetWindowText(hWndEdit_Integral, L"Паранормальные явления в районе try-catch");
-				return 0;
-			}
-			SetWindowText(hWndEdit_Integral, std::to_wstring(IntegerSum).c_str());
+			Text_Init(Wnd_Plot->text_);
+			if (hWnd_Integer_Wnd != NULL) DestroyWindow(hWnd_Integer_Wnd);
+			hWnd_Integer_Wnd = CreateWindowEx(0, Integral_Wnd_NAME, L"График интеграла функции", WS_SYSMENU | WS_THICKFRAME | WS_POPUP | WS_CAPTION | WS_VISIBLE, 0, 0, 300, 300, hWnd, NULL, hInst, nullptr);
+			HWND_Integral_Init(hWnd_Integer_Wnd);
+			//Wnd_Plot->setka.h_setka = 10;
+			//Wnd_Plot->setka.h5_setka = Wnd_Plot->setka.h_setka * 5;
+			////здесь мы говорим, что наш график будет состоять из 10 больших клеток
+			//Wnd_Plot->setka.u5_setka = Setka_unit((Myintegr.B - Myintegr.A) / 9);//пусть наш график торетически помещается в 8 клеток по ширине
+			//Wnd_Plot->setka.mantissa = floor(log10(Wnd_Plot->setka.u5_setka));
+			//Wnd_Plot->setka.kxy_zoom = Wnd_Plot->setka.h5_setka / Wnd_Plot->setka.u5_setka;
+			//Wnd_Plot->setka.unit_to_pixel = 1.0 / Wnd_Plot->setka.kxy_zoom;
+			////////////////////////////////////////////////
+			//Plotting_edges_upd(2, Wnd_Plot);
+			//FirstPlotting(Wnd_Plot, Myintegr.vec);
+			////////////////////////////////////////////////
+			//double correct_x = 0;
+			//double size_of_plot = FillIntegralVector(Myintegr, Wnd_Plot, correct_x);
+			//Wnd_Plot->setka.u5_setka = Setka_unit(size_of_plot / 9);
+			//CorrectSetkaPos(0, Wnd_Plot, Myintegr.vec);
+			//CorrectSetkaPos(0, Wnd_Plot, Myintegr.integral_plot);
+			//Wnd_Plot->setka.sx_center = Wnd_Plot->sx / 2 - correct_x * Wnd_Plot->setka.kxy_zoom;
+			//Wnd_Plot->setka.sy_center = Wnd_Plot->sy / 2;
+			//Plotting_edges_upd(2, Wnd_Plot);			
+			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 		}
 		return 0;
 		case HWNDBUTTON_HOME:
@@ -274,7 +296,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			Wnd_Plot->setka.h5_setka = Wnd_Plot->setka.h_setka * 5;
 			Wnd_Plot->setka.kxy_zoom = Wnd_Plot->setka.h5_setka / Wnd_Plot->setka.u5_setka;
 			Wnd_Plot->setka.unit_to_pixel = 1.0 / Wnd_Plot->setka.kxy_zoom;
-			Plotting_edges_upd(2, Wnd_Plot, Myplot);
+			Plotting_edges_upd(2, Wnd_Plot);
 			RedrawPlot(Wnd_Plot, Myplot);
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 			return 0;
@@ -294,19 +316,24 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
-LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
+
+
+
+LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	PAINTSTRUCT  ps2;
 	HDC memdc;
 	HBITMAP membit;
 	HDC hdc2{};
-
+	static Pen* Pen_for_plot;
+	
 	switch (message)
 	{
 	case WM_CREATE:
+		Pen_for_plot = GetPen_for_Main_Plot();
 		return 0;
 	case WM_LBUTTONDOWN:
-		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam), Wnd_Plot);
+		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam), Wnd_Plot, MyMouse);
 		return 0;
 	case WM_MOUSEMOVE:
 		if (MyMouse.Flag_for_mouse)
@@ -320,34 +347,24 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			MyMouse.Prev_mouse_point.x = x;
 			MyMouse.Prev_mouse_point.y = y;
 
-			Plotting_edges_upd(2, Wnd_Plot, Myplot);
+			Plotting_edges_upd(2, Wnd_Plot);
 			if (Wnd_Plot->setka.LLeft < Wnd_Plot->setka.Left_Wide_Vec || Wnd_Plot->setka.RRight > Wnd_Plot->setka.Right_Wide_Vec)
 			{
 				Wnd_Plot->setka.Left_Wide_Vec = Wnd_Plot->setka.LLeft - (Wnd_Plot->setka.Wide_Vec / 2 - 1000) * Wnd_Plot->setka.unit_to_pixel;
 				Wnd_Plot->setka.Right_Wide_Vec = Wnd_Plot->setka.LLeft + (Wnd_Plot->setka.Wide_Vec / 2 - 1000) * Wnd_Plot->setka.unit_to_pixel;
 				RedrawPlot(Wnd_Plot, Myplot);
 			}
-
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 		}
 		return 0;
 	case WM_LBUTTONUP:
 		MyMouse.Flag_for_mouse = FALSE;
 		return 0;
-	case WM_NCLBUTTONUP:
-		MyMouse.Flag_for_mouse = FALSE;
-		return 0;
-	case WM_NCLBUTTONDOWN:
-		MyMouse.Flag_for_mouse = FALSE;
-		return 0;
-	case WM_NCMOUSELEAVE:
-		MyMouse.Flag_for_mouse = FALSE;
-		return 0;
 	case WM_MOUSEWHEEL:
 	{
 		int a = Wnd_Plot->setka.h_setka;
 		Wnd_Plot->setka.h_setka += GET_WHEEL_DELTA_WPARAM(wParam) / 120;
-		/*{
+		/*{//попытка сделать приближение к центру экрана а не к СК
 			if (Wnd_Plot->setka.sx_center > Wnd_Plot->sx / 2)
 				Wnd_Plot->setka.sx_center += GET_WHEEL_DELTA_WPARAM(wParam);
 			else if (Wnd_Plot->setka.sx_center == Wnd_Plot->sx / 2) {}
@@ -360,7 +377,14 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			else
 				Wnd_Plot->setka.sy_center -= GET_WHEEL_DELTA_WPARAM(wParam);
 		}*/
-		CorrectSetkaPos(0, Wnd_Plot, Myplot);
+		if (Wnd_Plot->Draw_way == DRAW_INTEGRAL) {
+			CorrectSetkaPos(0, Wnd_Plot, Myintegr.vec);
+			CorrectSetkaPos(0, Wnd_Plot, Myintegr.integral_plot);
+		}
+		else {
+			CorrectSetkaPos(0, Wnd_Plot, Myplot);
+		}
+		//RedrawPlot(Wnd_Plot, Myplot);
 		InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 	}
 	return 0;
@@ -372,18 +396,24 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		return 1;
 	case WM_PAINT:
 	{
-		SimpleTimer timer;
+		//SimpleTimer timer;
 		hdc2 = BeginPaint(Wnd_Plot->hWnd, &ps2);
 		memdc = CreateCompatibleDC(hdc2);
 		membit = CreateCompatibleBitmap(hdc2, Wnd_Plot->sx, Wnd_Plot->sy);
 		SelectObject(memdc, membit);
-		DrowSetka(memdc, Wnd_Plot, Myplot);
-		DrowCounts(memdc, Wnd_Plot, Myplot);
+		DrowSetka(memdc, Wnd_Plot);
+		DrowCounts(memdc, Wnd_Plot);
+		//if (!Myplot.picsel.empty())
+		//{
+		//	DrowGraphSmooth(memdc, Wnd_Plot, Myplot);
+		//	//DrowGraph(memdc, Wnd_Plot);оставим для экспериментов - рисование без GDI+
+		//}
 		if (!Myplot.picsel.empty())
 		{
-			DrowGraphSmooth(memdc, Wnd_Plot, Myplot);
+			DrowGraphSmooth(memdc, Wnd_Plot, Myplot, Pen_for_plot);
 			//DrowGraph(memdc, Wnd_Plot);оставим для экспериментов - рисование без GDI+
 		}
+	
 		BitBlt(hdc2, 0, 0, Wnd_Plot->sx * 2, Wnd_Plot->sy * 2, memdc, 0, 0, SRCCOPY);
 		DeleteDC(memdc);
 		DeleteObject(membit);
@@ -391,6 +421,7 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	}
 	return 0;
 	case WM_DESTROY:
+		//delete Pen_for_plot;
 		PostQuitMessage(0);
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	default: return DefWindowProc(hWnd, message, wParam, lParam);

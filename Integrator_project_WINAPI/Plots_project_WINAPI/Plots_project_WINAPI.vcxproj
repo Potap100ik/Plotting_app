@@ -127,8 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Custom_for_nice_veiw.h" />
     <ClInclude Include="Debug_sys\Debug_sys.h" />
     <ClInclude Include="Debug_sys\Neudachi.h" />
+    <ClInclude Include="Integral_Wnd.h" />
     <ClInclude Include="Integrate\Simps_meth.h" />
     <ClInclude Include="Main_files\lib_struct.h" />
     <ClInclude Include="Main_files\main_header.h" />
@@ -146,12 +148,14 @@
     <Image Include="5260316_analytics_box_chart_diagram_graph_icon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Integral_Wnd.cpp" />
     <ClCompile Include="Integrate\Simps_meth.cpp" />
     <ClCompile Include="Main_files\MAIN.cpp" />
     <ClCompile Include="Main_files\main_functions.cpp" />
     <ClCompile Include="Main_files\STD\stdafx.cpp" />
     <ClCompile Include="Main_files\WndProc.cpp" />
     <ClCompile Include="Plotting.cpp" />
+    <ClCompile Include="Custom_for_nice_veiw.cpp" />
     <ClCompile Include="Str_to_double\char_change.cpp" />
     <ClCompile Include="Str_to_double\str_to_double.cpp" />
   </ItemGroup>
