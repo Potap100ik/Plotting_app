@@ -4,8 +4,9 @@
 //#include <stdio.h>
 #include <cmath>
 #include <string.h>
+#include <Windows.h>
 #include "char_change.h"
-#define DEBUG
+//#define DEBUG
 const double M_E = 2.71828182845904523;
 const double M_PI = 3.1415926535897932;
 

@@ -51,7 +51,10 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипуляц
 		sprintf(str1, "%lf", Function_String_to_Double(str2 + 1, x, y));
 		break;
 	default:
+
+		//MessageBox(0, L"Уважаемый прогер\nГде числа?!!!\nИз чего интегралы строить", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
 		cout << "ERROR 6 - хулиганство функционального масштаба - ПОЗОВИТЕ РАЗРАБА И СКАЖИТЕ ЧТО ВЫ СДЕЛАЛИ" << endl;
+
 		return 0;
 	}
 	//sprintf(str1, "%lf", Function_Count(str2 + 1, x, y));//преобразуем внутрискобочное выражение 1 в вещественное число и помещаем в str1
@@ -542,7 +545,7 @@ long double Function_String_to_Double(char* str, double* x, int y)
 	else
 	{
 		cout << "ERROR 2 - найден нелицеприятный знак в начале строки, взгляните: " << str[0] << endl << "Удаляем? (1/0)" << endl;
-		int u;
+		int u = 1;
 #ifdef DEBUG
 		u = 0;
 #endif //DEBUG

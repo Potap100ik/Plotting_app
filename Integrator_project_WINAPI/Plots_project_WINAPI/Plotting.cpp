@@ -1,4 +1,7 @@
 #include "Plotting.h"
+#define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, d);
+#define LineTo(a, x, y); LineTo(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center);
+#define TextOutW(dc, x, y, s, st); TextOutW(dc, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, s, st);
 
 void DrowSetka(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 {
@@ -38,7 +41,7 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 {
 	HFONT hFont1 = CreateFont(11, 0, 0, 0, 600, 0, 0, 0,
 		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, _T("Lusida Console"));
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lusida Console");
 	SelectObject(dc, GetStockObject(DC_PEN));
 	SetDCPenColor(dc, RGB(0, 0, 0));
 	SelectObject(dc, hFont1);
@@ -60,7 +63,7 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 	}
 
 	double ux = Wnd_Plot->setka.u5_setka * Wnd_Plot->setka.x_LL5 / Wnd_Plot->setka.h5_setka / pow(10, mantissa);;
-	TCHAR s[20];
+	WCHAR str_[20];
 	//проверка на вещественность иди целостность координат
 	//if (Wnd_Plot->setka.u5_setka < 1)zerocount = abs(round(log10(Wnd_Plot->setka.u5_setka))) + 1;
 	SetTextAlign(dc, TA_TOP | TA_CENTER);
@@ -71,26 +74,26 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		ix < Wnd_Plot->setka.x_RR - Wnd_Plot->setka.h5_setka/2;
 		ix += Wnd_Plot->setka.h5_setka) {
 		if (mantissa == 0)
-			_stprintf(s, L"%.*lf", zerocount, ux);
+			swprintf(str_, L"%.*lf", zerocount, ux);
 		else
-			_stprintf(s, L"%.*lf^[%d]", zerocount, ux, mantissa);
+			swprintf(str_, L"%.*lf^[%d]", zerocount, ux, mantissa);
 
 		if (abs(ix) < Wnd_Plot->setka.h_setka)
 		{
-			_stprintf(s, L"%d", 0);
-			TextOutW(dc, ix + 10, -8, s, _tcslen(s));
+			swprintf(str_, L"%d", 0);
+			TextOutW(dc, ix + 10, -8, str_, wcslen(str_));
 		}
 		else {
 
-			TextOutW(dc, ix, (Wnd_Plot->setka.y_TT - 10), s, _tcslen(s));//рисуем на топе доп координаты
+			TextOutW(dc, ix, (Wnd_Plot->setka.y_TT - 10), str_, wcslen(str_));//рисуем на топе доп координаты
 			MoveToEx(dc, ix, (Wnd_Plot->setka.y_TT - 10), NULL);
 			LineTo(dc, ix, (Wnd_Plot->setka.y_TT + 10));
 
-			TextOutW(dc, ix, (Wnd_Plot->setka.y_BB + 20), s, _tcslen(s));
+			TextOutW(dc, ix, (Wnd_Plot->setka.y_BB + 20), str_, wcslen(str_));
 			MoveToEx(dc, ix, (Wnd_Plot->setka.y_BB - 10), NULL);
 			LineTo(dc, ix, (Wnd_Plot->setka.y_BB + 10));
 
-			TextOutW(dc, ix, -10, s, _tcslen(s));
+			TextOutW(dc, ix, -10, str_, wcslen(str_));
 			MoveToEx(dc, ix, -10, NULL);
 			LineTo(dc, ix, 10);
 		}
@@ -103,21 +106,21 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		Wnd_Plot->setka.y_BB5 = ((Wnd_Plot->setka.y_BB / Wnd_Plot->setka.h5_setka)) * Wnd_Plot->setka.h5_setka;
 	for (int iy = Wnd_Plot->setka.y_BB5; iy < Wnd_Plot->setka.y_TT - Wnd_Plot->setka.h5_setka/2; iy += Wnd_Plot->setka.h5_setka) {
 		if (mantissa == 0)
-			_stprintf(s, L"%.*lf", zerocount, uy);
+			swprintf(str_, L"%.*lf", zerocount, uy);
 		else
-			_stprintf(s, L"%.*lf^[%d]", zerocount, uy, mantissa);
+			swprintf(str_, L"%.*lf^[%d]", zerocount, uy, mantissa);
 
 		if (abs(iy) < Wnd_Plot->setka.h_setka) {}
 		else {
-			TextOutW(dc, 15, iy, s, _tcslen(s));
+			TextOutW(dc, 15, iy, str_, wcslen(str_));
 			MoveToEx(dc, 10, iy, NULL);
 			LineTo(dc, -10, iy);
 
-			TextOutW(dc, (Wnd_Plot->setka.x_LL + 15), iy, s, _tcslen(s));
+			TextOutW(dc, (Wnd_Plot->setka.x_LL + 15), iy, str_, wcslen(str_));
 			MoveToEx(dc, (Wnd_Plot->setka.x_LL + 10), iy, NULL);
 			LineTo(dc, (Wnd_Plot->setka.x_LL - 10), iy);
 
-			TextOutW(dc, (Wnd_Plot->setka.x_RR - 20), (iy + 5), s, _tcslen(s));
+			TextOutW(dc, (Wnd_Plot->setka.x_RR - 20), (iy + 5), str_, wcslen(str_));
 			MoveToEx(dc, (Wnd_Plot->setka.x_RR + 10), iy, NULL);
 			LineTo(dc, (Wnd_Plot->setka.x_RR - 10), iy);
 		}
@@ -167,7 +170,6 @@ void DrowGraphSmooth(HDC dc, Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, 
 			((int)(Myplot.picsel[i].x)) + Wnd_Plot->setka.sx_center,
 			((int)(Myplot.picsel[i].y)) * (-1) + Wnd_Plot->setka.sy_center);
 	}
-
 	Gdiplus::CachedBitmap  cBitmap(buffer, graph);
 	graph->DrawCachedBitmap(&cBitmap, 0, 0);
 	delete buffer;

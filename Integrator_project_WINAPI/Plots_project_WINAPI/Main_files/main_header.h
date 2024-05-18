@@ -19,7 +19,7 @@ void CorrectSetkaPos(int a, MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot, int h_
 void MousePos(BOOL, int, int, MyWnd_Plot*, MouseMove&);
 void FirstPlotting(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
 void RedrawPlot(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
-double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot*, double &);
+double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot* Wnd_Plot, double& correct_x, double& correct_y);
 int CheckValues_of_edit(double A, double B, double H, HWND hWnd, HWND hWndEdit_Integral, MyWnd_Plot* Wnd_Plot);
 void Text_Init(LPSTR text_);
 //оконные процедуры

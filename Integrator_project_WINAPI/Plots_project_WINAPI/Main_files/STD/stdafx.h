@@ -6,12 +6,10 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #pragma warning(disable : 4996)
 
 #include <Windows.h>
-#include <tchar.h>
 #include <cmath>
 #include <string>
 #include <stdio.h>
 #include <vector>
 #include <gdiplus.h>
-#include <array>
-
+#include <Commctrl.h>
 

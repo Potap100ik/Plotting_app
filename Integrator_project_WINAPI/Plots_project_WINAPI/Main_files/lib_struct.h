@@ -1,17 +1,14 @@
 #pragma once
-#define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, d);
-#define LineTo(a, x, y); LineTo(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center);
-#define TextOutW(dc, x, y, s, st); TextOutW(dc, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, s, st);
 //константы
 #define MAX_LOADSTRING 100
-#define edit_otst1 60
-#define edit_otst2 20
 //Типы данных
 enum CTL_ID {
 	HWNDBUTTON_ENTER,
+	HWNDBUTTON_HOME,
 	HWNDBUTTON_CLEARPLOT,
 	HWNDBUTTON_INTEGER,
-	HWNDBUTTON_HOME,
+	HWNDEDIT_INTEGER,
+	HWNDEDIT_ERROR,
 	HWNDEDIT_BASE,
 	HWNDEDIT_A,
 	HWNDEDIT_B,

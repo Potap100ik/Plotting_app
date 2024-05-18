@@ -1,16 +1,17 @@
 #pragma comment(lib, "GdiPlus.lib")
 #include "../Main_files/STD/stdafx.h"
 #include "../Main_files/STD/Standard.h"
-#define CONSOLE
+//#define CONSOLE
 
 HINSTANCE hInst;
 //MyWnd_Plot* Wnd_Plot;
-TCHAR WidMain_NAME[MAX_LOADSTRING] = _T("MainWindow");
+WCHAR WidMain_NAME[MAX_LOADSTRING] = L"MainWindow";
 
-int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
 {
 	//делаем консоль видимой дл€ удобства - можно делать cout и дебажить как хочетс€ - откл: закомментить #define CONSOLE
 #ifdef CONSOLE
+	SetConsoleCP(1251);
 	setlocale(LC_ALL, "Rus");
 	FILE* conin = stdin;
 	FILE* conout = stdout;
@@ -29,38 +30,38 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCm
 	ULONG_PTR gdiplusToken;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 	hInst = hInstance;
-	WNDCLASS wc{}; 
+	WNDCLASS wc{};
 	wc.hInstance = hInstance;
 	wc.lpszClassName = WidMain_NAME;
-	wc.lpfnWndProc = WinProc; 
-	wc.style = CS_HREDRAW | CS_VREDRAW; 
+	wc.lpfnWndProc = WinProc;
+	wc.style = CS_HREDRAW | CS_VREDRAW;
 	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.lpszMenuName = NULL;
-	wc.cbClsExtra = 0; 
-	wc.cbWndExtra = 0; 
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);	
-	if (!RegisterClass(&wc)) return 0; 
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	if (!RegisterClass(&wc)) return 0;
 
-	HWND hWnd = CreateWindow(
-		WidMain_NAME, 
-		_T(" аркас Windows-приложени€"), 
-		WS_OVERLAPPEDWINDOW, 
-		CW_USEDEFAULT, 
-		CW_USEDEFAULT, 
+	HWND hWnd = CreateWindowW(
+		WidMain_NAME,
+		L" аркас Windows-приложени€",
+		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
-		CW_USEDEFAULT, 
-		HWND_DESKTOP, 
-		NULL, 
+		CW_USEDEFAULT,
+		MINIMUM_BASE_WND_WIDTH,//GetSystemMetrics(SM_CXSCREEN),
+		MINIMUM_BASE_WND_HEIGHT,
+		HWND_DESKTOP,
+		NULL,
 		hInstance,
-		NULL); 
-	ShowWindow(hWnd, nCmdShow); 
+		NULL);
+	ShowWindow(hWnd, nCmdShow);
 
 	MSG msg{};
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&msg); 
-		DispatchMessage(&msg); 
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
 	//прощание с GDI+

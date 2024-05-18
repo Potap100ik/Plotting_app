@@ -1,8 +1,8 @@
 #include "../Main_files/STD/stdafx.h"
 #include "../Main_files/STD/Standard.h"
 
-TCHAR Win_Plot_NAME[MAX_LOADSTRING] = _T("PlotWindow");
-TCHAR Integral_Wnd_NAME[MAX_LOADSTRING] = _T("Integral_Wnd");
+WCHAR Win_Plot_NAME[MAX_LOADSTRING] = L"PlotWindow";
+WCHAR Integral_Wnd_NAME[MAX_LOADSTRING] = L"Integral_Wnd";
 
 
 
@@ -17,18 +17,19 @@ Integral_struct Myintegr{};
 HWND
 hWndButton_enter{},
 hWndButton_clearPlot{},
-hWndButton_clearEdit{},
+hWndButton_Integral{},
 hWndButton_home{},
 hWndEdit_base{},
 hWndEdit_A{},
 hWndEdit_B{},
 hWndEdit_H{},
 hWndEdit_Integral{},
+hWndEdit_Erroors{},
 hWnd_Integer_Wnd{};
 
 LPVOID CreateControls(HWND hWnd)
 {
-	
+
 
 
 	hWndButton_enter = CreateWindowEx(
@@ -36,109 +37,162 @@ LPVOID CreateControls(HWND hWnd)
 		L"BUTTON",
 		L"Построить график",
 		WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
-		60, 120, 240, 30,
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_ENTER, 1),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_ENTER, 2),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_ENTER, 3),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_ENTER, 4),
 		hWnd,
 		reinterpret_cast<HMENU> (CTL_ID::HWNDBUTTON_ENTER),
 		nullptr, nullptr);
 	if (!hWndButton_enter)
-		MessageBox(NULL, _T("hWndButton_enter"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndButton_enter", L"Ошибка", MB_OK);
 
 	hWndButton_clearPlot = CreateWindowEx(
 		0,
 		L"BUTTON",
 		L"Убрать данные графика",
 		WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
-		edit_otst1, 160, 240, 30,
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_CLEARPLOT, 1),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_CLEARPLOT, 2),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_CLEARPLOT, 3),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_CLEARPLOT, 4),
 		hWnd,
 		reinterpret_cast<HMENU> (CTL_ID::HWNDBUTTON_CLEARPLOT),
 		nullptr, nullptr);
 	if (!hWndButton_clearPlot)
-		MessageBox(NULL, _T("hWndButton_clearPlot"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndButton_clearPlot", L"Ошибка", MB_OK);
 
-	hWndButton_clearEdit = CreateWindowEx(
+	hWndButton_Integral = CreateWindowEx(
 		0,
 		L"BUTTON",
-		L"Посчитать определенный интеграл",
+		L"",
 		WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
-		edit_otst1, 200, 240, 30,
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_INTEGER, 1),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_INTEGER, 2),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_INTEGER, 3),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_INTEGER, 4),
 		hWnd,
 		reinterpret_cast<HMENU> (CTL_ID::HWNDBUTTON_INTEGER),
 		nullptr, nullptr);
-	if (!hWndButton_clearEdit)
-		MessageBox(NULL, _T("hWndButton_clearEdit"), _T("Ошибка"), MB_OK);
+	if (!hWndButton_Integral)
+		MessageBox(NULL, L"hWndButton_clearEdit", L"Ошибка", MB_OK);
 
 	hWndButton_home = CreateWindowEx(
 		0,
 		L"BUTTON",
-		L"Ы",
+		L"",
 		WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
-		edit_otst1, 240, 50, 50,
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_HOME, 1),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_HOME, 2),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_HOME, 3),
+		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_HOME, 4),
 		hWnd,
 		reinterpret_cast<HMENU> (CTL_ID::HWNDBUTTON_HOME),
 		nullptr, nullptr);
-	if (!hWndButton_clearEdit)
-		MessageBox(NULL, _T("hWndButton_clearEdit"), _T("Ошибка"), MB_OK);
+	if (!hWndButton_Integral)
+		MessageBox(NULL, L"hWndButton_clearEdit", L"Ошибка", MB_OK);
 
 
 
 	hWndEdit_base = CreateWindow(
 		L"EDIT",
 		L"log(x)",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_MULTILINE,
-		edit_otst1, 40, 240, 30,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL  | ES_LEFT | ES_MULTILINE,
+		Get_EDIT_FUNC_koordinates(1),
+		Get_EDIT_FUNC_koordinates(2),
+		Get_EDIT_FUNC_koordinates(3),
+		Get_EDIT_FUNC_koordinates(4),
 		hWnd,
 		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_BASE),
 		nullptr, nullptr);
 
 	if (!hWndEdit_base)
-		MessageBox(NULL, _T("hWndEdit_base"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndEdit_base", L"Ошибка", MB_OK);
+	SetEditTypingCenter(hWndEdit_base, Get_EDIT_FUNC_koordinates);
+
 
 	hWndEdit_A = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
+		0,
 		L"EDIT",
 		L"1",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
-		edit_otst1, 80, 40, 30,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
+		Get_EDIT_ABH_koordinates('A', 1),
+		Get_EDIT_ABH_koordinates('A', 2),
+		Get_EDIT_ABH_koordinates('A', 3),
+		Get_EDIT_ABH_koordinates('A', 4),
 		hWnd,
 		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_A),
 		nullptr, nullptr);
 	if (!hWndEdit_A)
-		MessageBox(NULL, _T("hWndEdit_A"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndEdit_A", L"Ошибка", MB_OK);
+	SetEditTypingCenter(hWndEdit_A, 'A', Get_EDIT_ABH_koordinates);
+
+
 	hWndEdit_B = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
+		0,
 		L"EDIT",
 		L"10",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
-		edit_otst1 + 80, 80, 60, 30,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
+		Get_EDIT_ABH_koordinates('B', 1),
+		Get_EDIT_ABH_koordinates('B', 2),
+		Get_EDIT_ABH_koordinates('B', 3),
+		Get_EDIT_ABH_koordinates('B', 4),
 		hWnd,
 		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_B),
 		nullptr, nullptr);
 	if (!hWndEdit_B)
-		MessageBox(NULL, _T("hWndEdit_B"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndEdit_B", L"Ошибка", MB_OK);
+	SetEditTypingCenter(hWndEdit_B, 'B', Get_EDIT_ABH_koordinates);
 
 	hWndEdit_H = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
+		0,
 		L"EDIT",
 		L"0,1",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ETO_NUMERICSLOCAL,
-		edit_otst1 + 180, 80, 60, 30,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
+		Get_EDIT_ABH_koordinates('H', 1),
+		Get_EDIT_ABH_koordinates('H', 2),
+		Get_EDIT_ABH_koordinates('H', 3),
+		Get_EDIT_ABH_koordinates('H', 4),
 		hWnd,
 		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_H),
 		nullptr, nullptr);
 	if (!hWndEdit_H)
-		MessageBox(NULL, _T("hWndEdit_H"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndEdit_H", L"Ошибка", MB_OK);
+	SetEditTypingCenter(hWndEdit_H, 'H', Get_EDIT_ABH_koordinates);
+
 
 	hWndEdit_Integral = CreateWindowEx(
-		WS_EX_CLIENTEDGE,
+		0,
 		L"EDIT",
 		L"Интеграл появится тут",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL,
-		edit_otst1 + 100, 260, 200, 30,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
+		Get_EDIT_INTEGRAL_koordinates(1),
+		Get_EDIT_INTEGRAL_koordinates(2),
+		Get_EDIT_INTEGRAL_koordinates(3),
+		Get_EDIT_INTEGRAL_koordinates(4),
 		hWnd,
-		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_H),
+		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_INTEGER),
 		nullptr, nullptr);
 	if (!hWndEdit_Integral)
-		MessageBox(NULL, _T("hWndEdit_H"), _T("Ошибка"), MB_OK);
+		MessageBox(NULL, L"hWndEdit_Integral", L"Ошибка", MB_OK);
+	SetEditTypingCenter(hWndEdit_Integral, Get_EDIT_INTEGRAL_koordinates);
+
+
+	hWndEdit_Erroors = CreateWindowEx(
+		0,
+		L"EDIT",
+		L"Ошибки:",
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
+		Get_EDIT_ERRORS_koordinates(1),
+		Get_EDIT_ERRORS_koordinates(2),
+		Get_EDIT_ERRORS_koordinates(3),
+		Get_EDIT_ERRORS_koordinates(4),
+		hWnd,
+		reinterpret_cast<HMENU>(CTL_ID::HWNDEDIT_ERROR),
+		nullptr, nullptr);
+	if (!hWndEdit_Integral)
+		MessageBox(NULL, L"hWndEdit_Erroors", L"Ошибка", MB_OK);
+	//SetEditTypingCenter(hWndEdit_Erroors, Get_EDIT_ERRORS_koordinates);
 	return 0;
 }
 
@@ -172,39 +226,145 @@ ATOM MyRegisterChildClass()
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 {
 	PAINTSTRUCT ps;
-	Gdiplus::Bitmap* img{};
+	static Gdiplus::Bitmap* img_side{};
+	static Gdiplus::Bitmap* img_integral{};
+	static Gdiplus::Bitmap* img_home{};
+	static int img_height;
+	static int img_width;
 	Gdiplus::Graphics* graph{};
 	std::wstring text;
+
+	static HBRUSH defaultbrush;
+	static HBRUSH selectbrush;
+	static HBRUSH hotbrush;
+
+
+	//static Gdiplus::Bitmap* img_for_BASE_edit;
+	//static Gdiplus::Bitmap* img_for_A_edit;
+	//static Gdiplus::Bitmap* img_for_B_edit;
+	//static Gdiplus::Bitmap* img_for_H_edit;
+	//static Gdiplus::Bitmap* img_for_INTEGAL_edit;
+	//static Gdiplus::Bitmap* img_for_ERRORS_edit;
+	//static Gdiplus::Bitmap* img_for_MEMORY_CARD;
+
+
+
+	//static Gdiplus::Bitmap* img_for_ENTER_btn[3];
+	//static Gdiplus::Bitmap* img_for_HOME_btn[3];
+	//static Gdiplus::Bitmap* img_for_CLEAR_btn[3];
+	//static Gdiplus::Bitmap* img_for_INTEGRAL_btn[3];
+
+	static HFONT hFont;
 	switch (message)
 	{
 	case WM_CREATE:
+	{
+
 		Wnd_Plot = (MyWnd_Plot*)malloc(sizeof(Wnd_Plot_struct));
 		CreateControls(hWnd);
 		if (!MyRegisterChildClass())
-			MessageBox(NULL, _T("НЕ ВЫШЕЛ ГРАФИК ПОГУЛЯТЬ"), _T("Ошибка"), MB_OK);
+			MessageBox(NULL, L"НЕ ВЫШЕЛ ГРАФИК ПОГУЛЯТЬ", L"Ошибка", MB_OK);
 		if (!Register_Integer_Wnd_Class())
-			MessageBox(NULL, _T("НЕ ВЫШЕЛ ПУШНЫЙ ГРАФИК ПОГУЛЯТЬ"), _T("Ошибка"), MB_OK);
+			MessageBox(NULL, L"НЕ ВЫШЕЛ ПУШНЫЙ ГРАФИК ПОГУЛЯТЬ", L"Ошибка", MB_OK);
 		Wnd_Plot->hWnd = CreateWindow(Win_Plot_NAME, NULL, WS_CHILD | WS_DLGFRAME | WS_VISIBLE, 0, 0, 0, 0, hWnd, NULL, hInst, NULL);
 		StructInit(Wnd_Plot, Myplot, Myintegr);
-		MousePos(FALSE, 0, 0, Wnd_Plot,MyMouse);
-		return 0;
+		MousePos(FALSE, 0, 0, Wnd_Plot, MyMouse);
+		img_side = Gdiplus::Bitmap::FromFile(Side_image_adress);
+		img_height = img_side->GetHeight() * (Right_img_edge) / img_side->GetWidth();
+		img_width = Right_img_edge;
+		img_home = Gdiplus::Bitmap::FromFile(Image_Home_btn);
+		img_integral = Gdiplus::Bitmap::FromFile(Image_INTEGRAL_btn);
+
+
+		/*img_for_BASE_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_BASE);
+		img_for_A_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_A);
+		img_for_B_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_B);
+		img_for_H_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_H);
+		img_for_INTEGAL_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
+		img_for_ERRORS_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_ERRORS);
+		img_for_MEMORY_CARD = Gdiplus::Bitmap::FromFile(IMAGE_FOR_MEMORY_CARD);
+
+		img_for_ENTER_btn[0] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_ENTER[0]);
+		img_for_ENTER_btn[1] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_ENTER[1]);
+		img_for_ENTER_btn[2] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_ENTER[2]);
+
+		img_for_CLEAR_btn[0] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_CLEAR[0]);
+		img_for_CLEAR_btn[1] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_CLEAR[1]);
+		img_for_CLEAR_btn[2] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_CLEAR[2]);
+
+		img_for_HOME_btn[0] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_HOME[0]);
+		img_for_HOME_btn[1] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_HOME[1]);
+		img_for_HOME_btn[2] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_HOME[2]);
+
+		img_for_INTEGRAL_btn[0] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[0]);
+		img_for_INTEGRAL_btn[1] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[1]);
+		img_for_INTEGRAL_btn[2] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[2]);*/
+
+
+
+		LOGFONT lf;
+		
+		memset(&lf, 0, sizeof(LOGFONT));
+		lstrcpy(lf.lfFaceName, L"Times new roman"); // Имя шрифта.
+		lf.lfWeight = FONTWIDTH;
+		lf.lfHeight = FONTSIZE; // По высоте.
+		hFont = CreateFontIndirect(&lf);
+		//delete &lf;
+
+	}return 0;
+	case WM_GETMINMAXINFO:
+	{
+		LPMINMAXINFO lpMMI = (LPMINMAXINFO)lParam;
+		lpMMI->ptMinTrackSize.x = MINIMUM_BASE_WND_WIDTH;
+		lpMMI->ptMinTrackSize.y = MINIMUM_BASE_WND_HEIGHT;
+
+	}return 0;
+
 	case WM_SIZE:
-		Wnd_Plot->sx = LOWORD(lParam) - 405;
+	{
+		printf("sx = %5d sy = %5d\n", LOWORD(lParam), HIWORD(lParam));
+		Wnd_Plot->sx = LOWORD(lParam) - Left_Plot_Edge - 5;
 		Wnd_Plot->sy = HIWORD(lParam) - 5;
-		MoveWindow(Wnd_Plot->hWnd, 400, 0, Wnd_Plot->sx, Wnd_Plot->sy, 1);
+		MoveWindow(Wnd_Plot->hWnd, Left_Plot_Edge, 0, Wnd_Plot->sx, Wnd_Plot->sy, 1);
 		Wnd_Plot->setka.sx_center = Wnd_Plot->sx / 2;
 		Wnd_Plot->setka.sy_center = Wnd_Plot->sy / 2;
-		return 0;
+
+	}return 0;
+
+	case WM_NOTIFY:
+	{
+		LPNMHDR some_item = (LPNMHDR)lParam;
+		switch (some_item->code)
+		{
+		case NM_CUSTOMDRAW:
+		
+			if (some_item->hwndFrom == hWndButton_enter)
+				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT);
+				//CustomBTN_SET_IMAGE(hWnd, some_item, img_for_ENTER_btn);
+			else if (some_item->hwndFrom == hWndButton_clearPlot)
+				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT);
+			else if (some_item->hwndFrom == hWndButton_Integral)
+				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT, img_integral);
+			else if (some_item->hwndFrom == hWndButton_home)
+				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT, img_home);
+			break;
+		}
+
+	}return CDRF_DODEFAULT;
+
+	case WM_CTLCOLORBTN: //In order to make those edges invisble when we use RoundRect(),////////////////////////////////
+		//we make the color of our button's background match window's background
+		return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);
 
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-
-		case VK_RETURN:
-			printf("Hello Enter\n");
-			SendMessage(hWnd, WM_COMMAND, HWNDBUTTON_ENTER, NULL);
-			return 0;
+			//case VK_RETURN:
+			//	printf("Hello Enter\n");
+			//	SendMessage(hWnd, WM_COMMAND, HWNDBUTTON_ENTER, NULL);
+			//	return 0;
 		case HWNDBUTTON_ENTER:
+		{
 			Wnd_Plot->Draw_way = SIMPLE_PLOTTING;
 			text.clear();
 			text.reserve(MAX_LOADSTRING);
@@ -222,16 +382,19 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			UpdateWindow(Wnd_Plot->hWnd);
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 
-			return 0;
-		case	HWNDBUTTON_CLEARPLOT:
+		}return 0;
+		case HWNDBUTTON_CLEARPLOT:
+		{
+
 			Myplot.picsel.clear();
 			Myplot.myvec_xy.clear();
 			Wnd_Plot->text_ = (LPSTR)"";
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
-			return 0;
+
+		}return 0;
 		case HWNDBUTTON_INTEGER:
 		{
-			
+
 
 			Wnd_Plot->Draw_way = DRAW_INTEGRAL;
 			std::wstring Astr, Bstr, Hstr;
@@ -245,6 +408,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			GetWindowText(hWndEdit_B, &Bstr[0], MAX_LOADSTRING);
 			GetWindowText(hWndEdit_H, &Hstr[0], MAX_LOADSTRING);
 			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
+
 			Wnd_Plot->text_ = Wide_into_Ascii(text.c_str());
 			try
 			{
@@ -261,33 +425,22 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			Astr.clear(); Bstr.clear(); Hstr.clear(); text.clear();
 			if (CheckValues_of_edit(Myintegr.A, Myintegr.B, Myintegr.H, hWnd, hWndEdit_Integral, Wnd_Plot))
 				return 0;
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 			Text_Init(Wnd_Plot->text_);
 			if (hWnd_Integer_Wnd != NULL) DestroyWindow(hWnd_Integer_Wnd);
-			hWnd_Integer_Wnd = CreateWindowEx(0, Integral_Wnd_NAME, L"График интеграла функции", WS_SYSMENU | WS_THICKFRAME | WS_POPUP | WS_CAPTION | WS_VISIBLE, 0, 0, 300, 300, hWnd, NULL, hInst, nullptr);
+			RECT rc; GetWindowRect(hWnd, &rc);
+			
+			hWnd_Integer_Wnd = CreateWindowEx(0, Integral_Wnd_NAME, L"График интеграла функции",
+				WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME | WS_POPUP | WS_CAPTION | WS_VISIBLE,
+				Left_Plot_Edge + rc.left,  rc.top + 30, Wnd_Plot->sx / 2.1, Wnd_Plot->sy / 2.1,
+				hWnd, NULL, hInst, nullptr);
 			HWND_Integral_Init(hWnd_Integer_Wnd);
-			//Wnd_Plot->setka.h_setka = 10;
-			//Wnd_Plot->setka.h5_setka = Wnd_Plot->setka.h_setka * 5;
-			////здесь мы говорим, что наш график будет состоять из 10 больших клеток
-			//Wnd_Plot->setka.u5_setka = Setka_unit((Myintegr.B - Myintegr.A) / 9);//пусть наш график торетически помещается в 8 клеток по ширине
-			//Wnd_Plot->setka.mantissa = floor(log10(Wnd_Plot->setka.u5_setka));
-			//Wnd_Plot->setka.kxy_zoom = Wnd_Plot->setka.h5_setka / Wnd_Plot->setka.u5_setka;
-			//Wnd_Plot->setka.unit_to_pixel = 1.0 / Wnd_Plot->setka.kxy_zoom;
-			////////////////////////////////////////////////
-			//Plotting_edges_upd(2, Wnd_Plot);
-			//FirstPlotting(Wnd_Plot, Myintegr.vec);
-			////////////////////////////////////////////////
-			//double correct_x = 0;
-			//double size_of_plot = FillIntegralVector(Myintegr, Wnd_Plot, correct_x);
-			//Wnd_Plot->setka.u5_setka = Setka_unit(size_of_plot / 9);
-			//CorrectSetkaPos(0, Wnd_Plot, Myintegr.vec);
-			//CorrectSetkaPos(0, Wnd_Plot, Myintegr.integral_plot);
-			//Wnd_Plot->setka.sx_center = Wnd_Plot->sx / 2 - correct_x * Wnd_Plot->setka.kxy_zoom;
-			//Wnd_Plot->setka.sy_center = Wnd_Plot->sy / 2;
-			//Plotting_edges_upd(2, Wnd_Plot);			
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
-		}
-		return 0;
+		}return 0;
 		case HWNDBUTTON_HOME:
+		{
+
 			Wnd_Plot->setka.sx_center = Wnd_Plot->sx / 2;
 			Wnd_Plot->setka.sy_center = Wnd_Plot->sy / 2;
 			Wnd_Plot->setka.h_setka = 10;
@@ -299,18 +452,31 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			Plotting_edges_upd(2, Wnd_Plot);
 			RedrawPlot(Wnd_Plot, Myplot);
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
-			return 0;
+
+		}return 0;
 		}
 		return 0;
+	case WM_MOUSEMOVE:
+		printf("x: %5d y: %5d\n", LOWORD(lParam), HIWORD(lParam));
+		return 0;
+	case WM_ERASEBKGND://не надо белым закрашивать при перерисовке целое окно
+		return 1;
 	case WM_PAINT:
+	{
+
 		hdc = BeginPaint(hWnd, &ps);
-		img = Gdiplus::Bitmap::FromFile(L"1.png");
 		graph = new Gdiplus::Graphics(hdc);
-		graph->DrawImage(img, 0, 0, 399, 445);
+		graph->Clear(BACKGROUND_COLOR);
+		graph->DrawImage(img_side, 0, 0, img_width, img_height);
 		delete graph;
 		EndPaint(hWnd, &ps);
-		return 0;
+
+	}return 0;
 	case WM_DESTROY:
+		DeleteObject(defaultbrush);
+		DeleteObject(selectbrush);
+		DeleteObject(hotbrush);
+		DeleteObject(hFont);
 		PostQuitMessage(0);
 		return 0;
 	}
@@ -326,7 +492,7 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HBITMAP membit;
 	HDC hdc2{};
 	static Pen* Pen_for_plot;
-	
+
 	switch (message)
 	{
 	case WM_CREATE:
@@ -413,7 +579,7 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DrowGraphSmooth(memdc, Wnd_Plot, Myplot, Pen_for_plot);
 			//DrowGraph(memdc, Wnd_Plot);оставим для экспериментов - рисование без GDI+
 		}
-	
+
 		BitBlt(hdc2, 0, 0, Wnd_Plot->sx * 2, Wnd_Plot->sy * 2, memdc, 0, 0, SRCCOPY);
 		DeleteDC(memdc);
 		DeleteObject(membit);

@@ -13,13 +13,14 @@ using namespace Gdiplus;
 extern HWND//ну не хочу пока я разбираться как это перемещать между срр файлами по-другому
 hWndButton_enter,
 hWndButton_clearPlot,
-hWndButton_clearEdit,
+hWndButton_Integral,
 hWndButton_home,
 hWndEdit_base,
 hWndEdit_A,
 hWndEdit_B,
 hWndEdit_H,
 hWndEdit_Integral,
+hWndEdit_Erroors,
 hWnd_Integer_Wnd;
 
 LPSTR text_this;//для передачи в другой файл
@@ -109,7 +110,7 @@ void StructInit(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot, Integral_struct& M
 	SetWindowText(hWndEdit_base, L"sin(x)");//log(x)//sin(x)*abs(x)//x*x/10
 	SetWindowText(hWndEdit_A, L"0");// std::to_wstring(Myintegr.A).c_str()
 	SetWindowText(hWndEdit_B, L"10");
-	SetWindowText(hWndEdit_H, L"0,1");
+	SetWindowText(hWndEdit_H, L"0.1");
 	SetWindowText(hWndEdit_Integral, L"Ку-ку епта");
 
 	Myplot.picsel.reserve(Wnd_Plot->setka.Wide_Vec + 1);
@@ -273,24 +274,24 @@ int CheckValues_of_edit(double A, double B, double H, HWND hWnd, HWND hWndEdit_I
 {
 	double IntegerSum;
 	if (A == B) {
-		SetWindowText(hWndEdit_Integral, L"Интеграл равен нулю");
+		SetWindowText(hWndEdit_Erroors, L"Интеграл равен нулю");
 		return 1;
 	}
 	if (H == 0)
 	{
-		SetWindowText(hWndEdit_Integral, L"Шаг равен нулю");
+		SetWindowText(hWndEdit_Erroors, L"Шаг равен нулю");
 		return 1;
 	}
 	if (A > B || H == 0 || H > (B - A))
 	{
 		MessageBox(hWnd, L"Уважаемый прогер\nВ числах беспорядки!!!\nИз чего интегралы строить", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
-		SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
+		SetWindowText(hWndEdit_Erroors, L"Интеграл пока не равен");
 		return 1;
 	}
 	if (strlen(Wnd_Plot->text_) == 0)
 	{
 		MessageBox(hWnd, L"Уважаемый прогер\nГде ваша функция?", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
-		SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
+		SetWindowText(hWndEdit_Erroors, L"Интеграл пока не равен");
 		return 1;
 	}
 	try {
@@ -300,15 +301,15 @@ int CheckValues_of_edit(double A, double B, double H, HWND hWnd, HWND hWndEdit_I
 	{
 
 		if (isinf(error_nan) || isnan(error_nan))
-			SetWindowText(hWndEdit_Integral, L"Надо отрезок понепрерывнее");
+			SetWindowText(hWndEdit_Erroors, L"Найдена критическая точка/nПересмотрите границы интервала");
 		else
-			SetWindowText(hWndEdit_Integral, L"Паранормальные явления в районе try-catch");
+			SetWindowText(hWndEdit_Erroors, L"Паранормальные явления в районе try-catch");
 		return 1;
 	}
 	SetWindowText(hWndEdit_Integral, std::to_wstring(IntegerSum).c_str());
 	return 0;
 }
-double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot* Wnd_Plot, double & correct_x)
+double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot* Wnd_Plot, double & correct_x , double& correct_y)
 {
 	Myintegr.integral_plot.picsel.clear();
 	Myintegr.integral_plot.myvec_xy.clear();
@@ -348,12 +349,14 @@ double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot* Wnd_Plot, doubl
 	{
 		Myintegr.integral_plot.picsel.push_back({});
 		Myintegr.integral_plot.myvec_xy[i].y -= uy_max - (uy_max - uy_min) / 2;
+		Myintegr.integral_plot.myvec_xy[i].x -= ux_max - (ux_max - ux_min) / 2;
 
 		Myintegr.integral_plot.picsel[i].x = Myintegr.integral_plot.myvec_xy[i].x * Wnd_Plot->setka.kxy_zoom;
 		Myintegr.integral_plot.picsel[i].y = Myintegr.integral_plot.myvec_xy[i].y * Wnd_Plot->setka.kxy_zoom;
 	}
 
 	correct_x = ux_max - (ux_max - ux_min) / 2;
+	correct_y = uy_max - (uy_max - uy_min) / 2;
 	printf("sx-sy [%d, %d]\n", Wnd_Plot->setka.sx_center, Wnd_Plot->setka.sy_center);
 	return (ux_max - ux_min > uy_max - uy_min) ? ux_max - ux_min : uy_max - uy_min;
 }
