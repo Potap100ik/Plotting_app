@@ -35,7 +35,7 @@ LPVOID CreateControls(HWND hWnd)
 	hWndButton_enter = CreateWindowEx(
 		0,
 		L"BUTTON",
-		L"Построить график",
+		L"",
 		WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
 		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_ENTER, 1),
 		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_ENTER, 2),
@@ -50,7 +50,7 @@ LPVOID CreateControls(HWND hWnd)
 	hWndButton_clearPlot = CreateWindowEx(
 		0,
 		L"BUTTON",
-		L"Убрать данные графика",
+		L"",
 		WS_CHILD | BS_PUSHBUTTON | WS_VISIBLE,
 		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_CLEARPLOT, 1),
 		Get_BUTTON_ENTER_koordinates(HWNDBUTTON_CLEARPLOT, 2),
@@ -97,7 +97,7 @@ LPVOID CreateControls(HWND hWnd)
 	hWndEdit_base = CreateWindow(
 		L"EDIT",
 		L"log(x)",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL  | ES_LEFT | ES_MULTILINE,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
 		Get_EDIT_FUNC_koordinates(1),
 		Get_EDIT_FUNC_koordinates(2),
 		Get_EDIT_FUNC_koordinates(3),
@@ -238,21 +238,14 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	static HBRUSH selectbrush;
 	static HBRUSH hotbrush;
 
+	static Gdiplus::Bitmap* img_for_ENTER_btn[3];
+	static Gdiplus::Bitmap* img_for_HOME_btn[3];
+	static Gdiplus::Bitmap* img_for_CLEAR_btn[3];
+	static Gdiplus::Bitmap* img_for_INTEGRAL_btn[3];
 
-	//static Gdiplus::Bitmap* img_for_BASE_edit;
-	//static Gdiplus::Bitmap* img_for_A_edit;
-	//static Gdiplus::Bitmap* img_for_B_edit;
-	//static Gdiplus::Bitmap* img_for_H_edit;
-	//static Gdiplus::Bitmap* img_for_INTEGAL_edit;
-	//static Gdiplus::Bitmap* img_for_ERRORS_edit;
-	//static Gdiplus::Bitmap* img_for_MEMORY_CARD;
-
-
-
-	//static Gdiplus::Bitmap* img_for_ENTER_btn[3];
-	//static Gdiplus::Bitmap* img_for_HOME_btn[3];
-	//static Gdiplus::Bitmap* img_for_CLEAR_btn[3];
-	//static Gdiplus::Bitmap* img_for_INTEGRAL_btn[3];
+	static Gdiplus::Bitmap* main_buffer;
+	static Gdiplus::Image* main_image;
+	
 
 	static HFONT hFont;
 	switch (message)
@@ -276,13 +269,8 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		img_integral = Gdiplus::Bitmap::FromFile(Image_INTEGRAL_btn);
 
 
-		/*img_for_BASE_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_BASE);
-		img_for_A_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_A);
-		img_for_B_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_B);
-		img_for_H_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_H);
-		img_for_INTEGAL_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
-		img_for_ERRORS_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_ERRORS);
-		img_for_MEMORY_CARD = Gdiplus::Bitmap::FromFile(IMAGE_FOR_MEMORY_CARD);
+		main_buffer = CreateBitmapFor_MAINWND(img_height, img_width);
+		main_image = CreateImageFor_MAINWND( img_height, img_width);
 
 		img_for_ENTER_btn[0] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_ENTER[0]);
 		img_for_ENTER_btn[1] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_ENTER[1]);
@@ -298,19 +286,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 
 		img_for_INTEGRAL_btn[0] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[0]);
 		img_for_INTEGRAL_btn[1] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[1]);
-		img_for_INTEGRAL_btn[2] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[2]);*/
-
-
-
-		LOGFONT lf;
-		
-		memset(&lf, 0, sizeof(LOGFONT));
-		lstrcpy(lf.lfFaceName, L"Times new roman"); // Имя шрифта.
-		lf.lfWeight = FONTWIDTH;
-		lf.lfHeight = FONTSIZE; // По высоте.
-		hFont = CreateFontIndirect(&lf);
-		//delete &lf;
-
+		img_for_INTEGRAL_btn[2] = Gdiplus::Bitmap::FromFile(IMAGE_FOR_BUTTONS_INTEGRAL[2]);
 	}return 0;
 	case WM_GETMINMAXINFO:
 	{
@@ -337,16 +313,15 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		switch (some_item->code)
 		{
 		case NM_CUSTOMDRAW:
-		
+
 			if (some_item->hwndFrom == hWndButton_enter)
-				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT);
-				//CustomBTN_SET_IMAGE(hWnd, some_item, img_for_ENTER_btn);
+				CustomBTN_SET_IMAGE(hWnd, some_item, img_for_ENTER_btn);
 			else if (some_item->hwndFrom == hWndButton_clearPlot)
-				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT);
+				CustomBTN_SET_IMAGE(hWnd, some_item, img_for_CLEAR_btn);
 			else if (some_item->hwndFrom == hWndButton_Integral)
-				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT, img_integral);
+				CustomBTN_SET_IMAGE(hWnd, some_item, img_for_INTEGRAL_btn);
 			else if (some_item->hwndFrom == hWndButton_home)
-				CustomPushBTN(hWnd, some_item, selectbrush, hotbrush, defaultbrush, GRADIENT, img_home);
+				CustomBTN_SET_IMAGE(hWnd, some_item, img_for_HOME_btn);
 			break;
 		}
 
@@ -359,10 +334,6 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
-			//case VK_RETURN:
-			//	printf("Hello Enter\n");
-			//	SendMessage(hWnd, WM_COMMAND, HWNDBUTTON_ENTER, NULL);
-			//	return 0;
 		case HWNDBUTTON_ENTER:
 		{
 			Wnd_Plot->Draw_way = SIMPLE_PLOTTING;
@@ -430,10 +401,10 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 			Text_Init(Wnd_Plot->text_);
 			if (hWnd_Integer_Wnd != NULL) DestroyWindow(hWnd_Integer_Wnd);
 			RECT rc; GetWindowRect(hWnd, &rc);
-			
+
 			hWnd_Integer_Wnd = CreateWindowEx(0, Integral_Wnd_NAME, L"График интеграла функции",
 				WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME | WS_POPUP | WS_CAPTION | WS_VISIBLE,
-				Left_Plot_Edge + rc.left,  rc.top + 30, Wnd_Plot->sx / 2.1, Wnd_Plot->sy / 2.1,
+				Left_Plot_Edge + rc.left, rc.top + 30, Wnd_Plot->sx / 2.1, Wnd_Plot->sy / 2.1,
 				hWnd, NULL, hInst, nullptr);
 			HWND_Integral_Init(hWnd_Integer_Wnd);
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
@@ -463,11 +434,13 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		return 1;
 	case WM_PAINT:
 	{
-
 		hdc = BeginPaint(hWnd, &ps);
 		graph = new Gdiplus::Graphics(hdc);
 		graph->Clear(BACKGROUND_COLOR);
-		graph->DrawImage(img_side, 0, 0, img_width, img_height);
+
+		// Gdiplus::CachedBitmap*  cBitmap = new Gdiplus::CachedBitmap(main_buffer, graph);
+		//graph->DrawCachedBitmap(cBitmap, 0, 0);
+		graph->DrawImage(main_image, 0, 0, img_width, img_height);
 		delete graph;
 		EndPaint(hWnd, &ps);
 

@@ -1,7 +1,7 @@
 #pragma comment(lib, "GdiPlus.lib")
 #include "../Main_files/STD/stdafx.h"
 #include "../Main_files/STD/Standard.h"
-//#define CONSOLE
+#define CONSOLE
 
 HINSTANCE hInst;
 //MyWnd_Plot* Wnd_Plot;

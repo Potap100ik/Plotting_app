@@ -1,6 +1,17 @@
 #include "Main_files/STD/stdafx.h"
 #include "Main_files/STD/Standard.h"
 
+int Get_STATIC_FUNC_doordinates(int i)
+{
+	switch (i)
+	{
+	case 1: return 8;
+	case 2: return 8;
+	case 3: return 274;
+	case 4: return 69;
+	}
+	return 0;
+}
 int Get_EDIT_FUNC_koordinates(int i)
 {
 	switch (i)
@@ -8,6 +19,26 @@ int Get_EDIT_FUNC_koordinates(int i)
 	case 1: return 59;
 	case 2: return 32;
 	case 3: return 215;
+	case 4: return 45;
+	}
+	return 0;
+}
+int Get_STATIC_ABH_koordinates(char ch, int i)
+{
+	switch (i)
+	{
+	case 1:
+		switch (ch)
+		{
+		case 'A': return 8;
+		case 'B': return 102;
+		case 'H': return 196;
+		}
+
+		return 59;
+
+	case 2: return 87;// 104;
+	case 3: return 85;
 	case 4: return 45;
 	}
 	return 0;
@@ -32,6 +63,17 @@ int Get_EDIT_ABH_koordinates(char ch, int i)
 	}
 	return 0;
 }
+int Get_STATIC_INTEGRAL_koordinates(int i)
+{
+	switch (i)
+	{
+	case 1: return 8;
+	case 2: return 244;
+	case 3: return 269;
+	case 4: return 38;
+	}
+	return 0;
+}
 int Get_EDIT_INTEGRAL_koordinates(int i)
 {
 	switch (i)
@@ -40,6 +82,17 @@ int Get_EDIT_INTEGRAL_koordinates(int i)
 	case 2: return 244;
 	case 3: return 183;
 	case 4: return 38;
+	}
+	return 0;
+}
+int Get_STATIC_ERRORS_koordinates(int i)
+{
+	switch (i)
+	{
+	case 1: return 8;
+	case 2: return 302;
+	case 3: return 267;
+	case 4: return 34;
 	}
 	return 0;
 }
@@ -54,6 +107,18 @@ int Get_EDIT_ERRORS_koordinates(int i)
 	}
 	return 0;
 }
+
+int Get_MEMORY_CARD_koordinates(int i)
+{
+	switch (i)
+	{
+	case 1: return 8;
+	case 2: return 344;
+	case 3: return 267;
+	case 4: return 150;
+	}
+	return 0;
+}
 int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i)
 {
 
@@ -62,10 +127,10 @@ int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i)
 	case 1: //левая граница - х
 		switch (id)
 		{
-		case HWNDBUTTON_INTEGER: return 8;
+		case HWNDBUTTON_CLEARPLOT: return 8;
 		case HWNDBUTTON_HOME:  return 8;
 
-		case HWNDBUTTON_CLEARPLOT: return 56;
+		case HWNDBUTTON_INTEGER: return 56;
 		case HWNDBUTTON_ENTER: return 56;
 		}
 	case 2: //верхняя граница - y
@@ -74,16 +139,16 @@ int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i)
 		case HWNDBUTTON_HOME:    return 141;
 		case HWNDBUTTON_ENTER: return 141;
 
-		case HWNDBUTTON_INTEGER:       return 191;
-		case HWNDBUTTON_CLEARPLOT: return 191;
+		case HWNDBUTTON_CLEARPLOT:       return 191;
+		case HWNDBUTTON_INTEGER: return 191;
 		}
 	case 3: //ширина - х
 		switch (id)
 		{
-		case HWNDBUTTON_INTEGER: return 40;
+		case HWNDBUTTON_CLEARPLOT: return 40;
 		case HWNDBUTTON_HOME:  return 40;
 
-		case HWNDBUTTON_CLEARPLOT:return 225;
+		case HWNDBUTTON_INTEGER:return 225;
 		case HWNDBUTTON_ENTER:return 225;
 		}
 	case 4: //высота - y
@@ -92,8 +157,8 @@ int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i)
 		case HWNDBUTTON_HOME:      return 40;
 		case HWNDBUTTON_ENTER: return 40;
 
-		case HWNDBUTTON_INTEGER:    return 40;
-		case HWNDBUTTON_CLEARPLOT:return 40;
+		case HWNDBUTTON_CLEARPLOT:    return 40;
+		case HWNDBUTTON_INTEGER:return 40;
 		}
 	}
 	return 0;
@@ -125,8 +190,146 @@ void SetEditTypingCenter(HWND hWnd, char ch, int(*Koord_func)(char, int))
 	SendMessage(hWnd, EM_SETRECT, 0, (LPARAM)(RECT FAR*) & rc);
 }
 
+Gdiplus::Bitmap* CreateBitmapFor_MAINWND(int img_height, int img_width)
+{
+
+	Gdiplus::Bitmap* buffer = new (Gdiplus::Bitmap)(img_height, img_width);
+	Gdiplus::Graphics* graph = new (Gdiplus::Graphics)(buffer);
+
+	Gdiplus::Bitmap* img_for_BASE_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_BASE);
+	Gdiplus::Bitmap* img_for_A_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_A);
+	Gdiplus::Bitmap* img_for_B_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_B);
+	Gdiplus::Bitmap* img_for_H_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_H);
+	Gdiplus::Bitmap* img_for_INTEGAL_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
+	Gdiplus::Bitmap* img_for_ERRORS_edit = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
+	Gdiplus::Bitmap* img_for_MEMORY_CARD = Gdiplus::Bitmap::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
 
 
+
+	graph->Clear(BACKGROUND_COLOR);
+	
+	graph->DrawImage(img_for_BASE_edit,
+		Get_STATIC_FUNC_doordinates(1),
+		Get_STATIC_FUNC_doordinates(2),
+		Get_STATIC_FUNC_doordinates(3),
+		Get_STATIC_FUNC_doordinates(4));
+
+	graph->DrawImage(img_for_A_edit,
+		Get_STATIC_ABH_koordinates('A', 1),
+		Get_STATIC_ABH_koordinates('A', 2),
+		Get_STATIC_ABH_koordinates('A', 3),
+		Get_STATIC_ABH_koordinates('A', 4));
+	graph->DrawImage(img_for_B_edit,
+		Get_STATIC_ABH_koordinates('B', 1),
+		Get_STATIC_ABH_koordinates('B', 2),
+		Get_STATIC_ABH_koordinates('B', 3),
+		Get_STATIC_ABH_koordinates('B', 4));
+	graph->DrawImage(img_for_H_edit,
+		Get_STATIC_ABH_koordinates('H', 1),
+		Get_STATIC_ABH_koordinates('H', 2),
+		Get_STATIC_ABH_koordinates('H', 3),
+		Get_STATIC_ABH_koordinates('H', 4));
+
+	graph->DrawImage(img_for_INTEGAL_edit,
+		Get_STATIC_INTEGRAL_koordinates(1),
+		Get_STATIC_INTEGRAL_koordinates(2),
+		Get_STATIC_INTEGRAL_koordinates(3),
+		Get_STATIC_INTEGRAL_koordinates(4));
+
+	graph->DrawImage(img_for_INTEGAL_edit,
+		Get_STATIC_ERRORS_koordinates(1),
+		Get_STATIC_ERRORS_koordinates(2),
+		Get_STATIC_ERRORS_koordinates(3),
+		Get_STATIC_ERRORS_koordinates(4));
+
+	graph->DrawImage(img_for_INTEGAL_edit,
+		Get_MEMORY_CARD_koordinates(1),
+		Get_MEMORY_CARD_koordinates(2),
+		Get_MEMORY_CARD_koordinates(3),
+		Get_MEMORY_CARD_koordinates(4));
+
+	delete graph;
+
+	delete img_for_BASE_edit;
+	delete img_for_A_edit;
+	delete img_for_B_edit;
+	delete img_for_H_edit;
+	delete img_for_INTEGAL_edit;
+	delete img_for_ERRORS_edit;
+	delete 	img_for_MEMORY_CARD;
+
+	return buffer;
+}
+Gdiplus::Image* CreateImageFor_MAINWND(int img_height, int img_width)
+{
+
+	Gdiplus::Bitmap* buffer = new (Gdiplus::Bitmap)(img_height, img_width);
+	Gdiplus::Graphics* graph = new (Gdiplus::Graphics)(buffer);
+
+	Gdiplus::Image* img_for_BASE_edit = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_BASE);
+	Gdiplus::Image* img_for_A_edit = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_A);
+	Gdiplus::Image* img_for_B_edit = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_B);
+	Gdiplus::Image* img_for_H_edit = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_H);
+	Gdiplus::Image* img_for_INTEGAL_edit = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
+	Gdiplus::Image* img_for_ERRORS_edit = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
+	Gdiplus::Image* img_for_MEMORY_CARD = Gdiplus::Image::FromFile(IMAGE_FOR_EDIT_INTEGRAL);
+
+
+
+	graph->Clear(BACKGROUND_COLOR);
+
+	graph->DrawImage(img_for_BASE_edit,
+		Get_STATIC_FUNC_doordinates(1),
+		Get_STATIC_FUNC_doordinates(2),
+		Get_STATIC_FUNC_doordinates(3),
+		Get_STATIC_FUNC_doordinates(4));
+
+	graph->DrawImage(img_for_A_edit,
+		Get_STATIC_ABH_koordinates('A', 1),
+		Get_STATIC_ABH_koordinates('A', 2),
+		Get_STATIC_ABH_koordinates('A', 3),
+		Get_STATIC_ABH_koordinates('A', 4));
+	graph->DrawImage(img_for_B_edit,
+		Get_STATIC_ABH_koordinates('B', 1),
+		Get_STATIC_ABH_koordinates('B', 2),
+		Get_STATIC_ABH_koordinates('B', 3),
+		Get_STATIC_ABH_koordinates('B', 4));
+	graph->DrawImage(img_for_H_edit,
+		Get_STATIC_ABH_koordinates('H', 1),
+		Get_STATIC_ABH_koordinates('H', 2),
+		Get_STATIC_ABH_koordinates('H', 3),
+		Get_STATIC_ABH_koordinates('H', 4));
+
+	graph->DrawImage(img_for_INTEGAL_edit,
+		Get_STATIC_INTEGRAL_koordinates(1),
+		Get_STATIC_INTEGRAL_koordinates(2),
+		Get_STATIC_INTEGRAL_koordinates(3),
+		Get_STATIC_INTEGRAL_koordinates(4));
+
+	graph->DrawImage(img_for_INTEGAL_edit,
+		Get_STATIC_ERRORS_koordinates(1),
+		Get_STATIC_ERRORS_koordinates(2),
+		Get_STATIC_ERRORS_koordinates(3),
+		Get_STATIC_ERRORS_koordinates(4));
+
+	graph->DrawImage(img_for_INTEGAL_edit,
+		Get_MEMORY_CARD_koordinates(1),
+		Get_MEMORY_CARD_koordinates(2),
+		Get_MEMORY_CARD_koordinates(3),
+		Get_MEMORY_CARD_koordinates(4));
+
+	delete graph;
+
+	delete img_for_BASE_edit;
+	delete img_for_A_edit;
+	delete img_for_B_edit;
+	delete img_for_H_edit;
+	delete img_for_INTEGAL_edit;
+	delete img_for_ERRORS_edit;
+	delete 	img_for_MEMORY_CARD;
+
+	return buffer;
+}
 
 Gdiplus::Pen* GetPen_for_Integral()
 {
@@ -356,36 +559,28 @@ void CustomPushBTN(HWND& hwnd, LPNMHDR some_item, HBRUSH selectbrush, HBRUSH hot
 void CustomBTN_SET_IMAGE(HWND& hwnd, LPNMHDR some_item, Gdiplus::Bitmap** img)
 {
 	LPNMCUSTOMDRAW item = (LPNMCUSTOMDRAW)some_item;
-	if (item->uItemState & CDIS_SELECTED)
+	Gdiplus::Graphics* graph = new (Gdiplus::Graphics)(item->hdc);
+	int right = item->rc.right, left = item->rc.left, top = item->rc.top, bottom = item->rc.bottom;
+	Gdiplus::Bitmap* buffer = new (Gdiplus::Bitmap)(right, bottom);
+	Gdiplus::Graphics* myGraphics = new (Gdiplus::Graphics)(buffer);
+	if (img != nullptr)
 	{
-		int right = item->rc.right, left = item->rc.left, top = item->rc.top, bottom = item->rc.bottom;
-		if (img != nullptr)
-		{
-			Gdiplus::Graphics graph(item->hdc);
-			graph.DrawImage(img[0], left, top, right, bottom);
-		}
-		return;
+
+		if (item->uItemState & CDIS_SELECTED)
+			myGraphics->DrawImage(img[0], left, top, right, bottom);
+		else
+			if (item->uItemState & CDIS_HOT)
+				myGraphics->DrawImage(img[1], left, top, right, bottom);
+			else
+				myGraphics->DrawImage(img[2], left, top, right, bottom);
 	}
-	else
-	{
-		if (item->uItemState & CDIS_HOT)
-		{
-			int right = item->rc.right, left = item->rc.left, top = item->rc.top, bottom = item->rc.bottom;
-			if (img != nullptr)
-			{
-				Gdiplus::Graphics graph(item->hdc);
-				graph.DrawImage(img[1], left, top, right, bottom);
-			}
-			return;
-		}
-		int right = item->rc.right, left = item->rc.left, top = item->rc.top, bottom = item->rc.bottom;
-		if (img != nullptr)
-		{
-			Gdiplus::Graphics graph(item->hdc);
-			graph.DrawImage(img[2], left, top, right, bottom);
-		}
-		return;
-	}
+
+	Gdiplus::CachedBitmap  cBitmap(buffer, graph);
+	graph->DrawCachedBitmap(&cBitmap, 0, 0);
+	delete buffer;
+	delete graph;
+	delete myGraphics;
+	return;
 }
 
 

@@ -14,27 +14,38 @@ int Get_EDIT_FUNC_koordinates(int i);
 int Get_EDIT_ABH_koordinates(char ch, int i);
 int Get_EDIT_INTEGRAL_koordinates(int i);
 int Get_EDIT_ERRORS_koordinates(int i);
+
+int Get_STATIC_FUNC_doordinates(int i);
+int Get_STATIC_ABH_koordinates(char ch, int i);
+int Get_STATIC_INTEGRAL_koordinates(int i);
+int Get_STATIC_ERRORS_koordinates(int i);
+int Get_MEMORY_CARD_koordinates(int i);
+
 int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i);
 
 void SetEditTypingCenter(HWND hWnd, int(*Koord_func)(int));
 void SetEditTypingCenter(HWND hWnd, char, int(*Koord_func)(char, int));
 
+Gdiplus::Bitmap* CreateBitmapFor_MAINWND(int img_height, int img_width);
+Gdiplus::Image* CreateImageFor_MAINWND(int img_height, int img_width);
+
 const WCHAR Side_image_adress[] = L"BACKSTAGE.jpg";
 const WCHAR Image_Home_btn[] = L"Home_btn.png";
 const WCHAR Image_INTEGRAL_btn[] = L"Integer_btn.png";
 
-//const WCHAR IMAGE_FOR_EDIT_BASE[] =  L"Bitmaps/Edit_BASE.png";
-//const WCHAR IMAGE_FOR_EDIT_A[] =  L"Bitmaps/Edit_A.png" ;
-//const WCHAR IMAGE_FOR_EDIT_B[] =  L"Bitmaps/Edit_B.png" ;
-//const WCHAR IMAGE_FOR_EDIT_H[] =  L"Bitmaps/Edit_H.png" ;
-//const WCHAR IMAGE_FOR_EDIT_INTEGRAL[] =  L"Bitmaps/Edit_INTEGRAL.png" ;
-//const WCHAR IMAGE_FOR_EDIT_ERRORS[] =  L"Bitmaps/Edit_ERRORS.png" ;
-//const WCHAR	IMAGE_FOR_MEMORY_CARD[] = L"Bitmaps/Memory_CARD.png";
-//
-//const WCHAR IMAGE_FOR_BUTTONS_ENTER[3][MAX_LOADSTRING] = {{L"Bitmaps/selected_btn_ENTER.png"},{L"Bitmaps/hot_btn_ENTER.png"},{L"Bitmaps/default_btn_ENTER.png"} };
-//const WCHAR IMAGE_FOR_BUTTONS_CLEAR[3][MAX_LOADSTRING] = { {L"Bitmaps/selected_btn_CLEAR.png"},{L"Bitmaps/hot_btn_CLEAR.png"},{L"Bitmaps/default_btn_CLEAR.png"} };
-//const WCHAR IMAGE_FOR_BUTTONS_HOME[3][MAX_LOADSTRING] = { {L"Bitmaps/selected_btn_HOME.png"},{L"Bitmaps/hot_btn_HOME.png"},{L"Bitmaps/default_btn_HOME.png"} };
-//const WCHAR IMAGE_FOR_BUTTONS_INTEGRAL[3][MAX_LOADSTRING] = { {L"selected_btn_INTEGRAL.png"},{L"hot_btn_INTEGRAL.png"},{L"default_btn_INTEGRAL.png"} };
+const WCHAR IMAGE_FOR_EDIT_BASE[] =  L"Bitmaps/Edit_BASE.png";
+const WCHAR IMAGE_FOR_EDIT_A[] =  L"Bitmaps/Edit_A.png" ;
+const WCHAR IMAGE_FOR_EDIT_B[] =  L"Bitmaps/Edit_B.png" ;
+const WCHAR IMAGE_FOR_EDIT_H[] =  L"Bitmaps/Edit_H.png" ;
+const WCHAR IMAGE_FOR_EDIT_INTEGRAL[] =  L"Bitmaps/Edit_INTEGRAL.png";
+
+const WCHAR IMAGE_FOR_EDIT_ERRORS[] = L"Edit_ERRORS.png";
+const WCHAR	IMAGE_FOR_MEMORY_CARD[] = L"Memory_CARD.png";
+
+const WCHAR IMAGE_FOR_BUTTONS_ENTER[3][MAX_LOADSTRING] = {{L"Bitmaps/selected_btn_ENTER.png"},{L"Bitmaps/hot_btn_ENTER.png"},{L"Bitmaps/default_btn_ENTER.png"} };
+const WCHAR IMAGE_FOR_BUTTONS_CLEAR[3][MAX_LOADSTRING] = { {L"Bitmaps/selected_btn_CLEAR.png"},{L"Bitmaps/hot_btn_CLEAR.png"},{L"Bitmaps/default_btn_CLEAR.png"} };
+const WCHAR IMAGE_FOR_BUTTONS_HOME[3][MAX_LOADSTRING] = { {L"Bitmaps/selected_btn_HOME.png"},{L"Bitmaps/hot_btn_HOME.png"},{L"Bitmaps/default_btn_HOME.png"} };
+const WCHAR IMAGE_FOR_BUTTONS_INTEGRAL[3][MAX_LOADSTRING] = { {L"Bitmaps/selected_btn_INTEGRAL.png"},{L"Bitmaps/hot_btn_INTEGRAL.png"},{L"Bitmaps/default_btn_INTEGRAL.png"} };
 
 
 const int Left_Plot_Edge = 300;//растояние в пикселях левой границы экрана с графиком

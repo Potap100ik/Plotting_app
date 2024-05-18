@@ -110,7 +110,7 @@ void StructInit(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot, Integral_struct& M
 	SetWindowText(hWndEdit_base, L"sin(x)");//log(x)//sin(x)*abs(x)//x*x/10
 	SetWindowText(hWndEdit_A, L"0");// std::to_wstring(Myintegr.A).c_str()
 	SetWindowText(hWndEdit_B, L"10");
-	SetWindowText(hWndEdit_H, L"0.1");
+	SetWindowText(hWndEdit_H, L"0,1");
 	SetWindowText(hWndEdit_Integral, L"Êó-êó åïòà");
 
 	Myplot.picsel.reserve(Wnd_Plot->setka.Wide_Vec + 1);
