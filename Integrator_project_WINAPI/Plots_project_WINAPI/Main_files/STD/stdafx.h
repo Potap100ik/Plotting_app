@@ -4,6 +4,9 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #pragma warning(disable : 4996)
+//#define CONSOLE
+//#define DEBUG
+//#define VECTOR_OUT
 
 #include <Windows.h>
 #include <cmath>

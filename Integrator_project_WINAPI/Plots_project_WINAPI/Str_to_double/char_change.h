@@ -5,7 +5,7 @@
 #include <stdio.h>
 #define MAX_LOADSTRING 100
 //проверяем некорректные знаки в введенной пользователем функции
-#define CANSELWORDS "()1234567890*/-+.expabslog10lnpowpisincostan"//то что нельзя удалять, если нашлось в начале строки
+#define CANSELWORDS "()1234567890*/-+.expabslog10lnpowpisincostantgctgctansqrtarctan"//то что нельзя удалять, если нашлось в начале строки
 
 char* char_to_swap(char* str, double x, char chh);
 char* char_to_clear(char* str, char chh);

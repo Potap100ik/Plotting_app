@@ -1,7 +1,7 @@
 #include "Simps_meth.h"
-double Simps_method(double a, double b, char* str, long double (*Function_Count)(char*, double*, int))
+double Simps_method(double a, double b, char* str, double (*Function_Count)(char*, double*, int))
 {
-	long double r{};
+	double r{};
 	int flags;
 	if (b < a) {
 		//std::cout << "b < a - непорядок" << std::endl;
@@ -21,9 +21,9 @@ double Simps_method(double a, double b, char* str, long double (*Function_Count)
 	}
 	return r;
 }
-double Integrator(double a, double b, double h, char* str, long double (*Function_Count)(char*, double*, int), double(*Method)(double, double, char*, long double (*Function_Count)(char*, double*, int)))
+double Integrator(double a, double b, double h, char* str, double (*Function_Count)(char*, double*, int), double(*Method)(double, double, char*, double (*Function_Count)(char*, double*, int)))
 {
-	long double sum = 0;
+	double sum = 0;
 	int flags;
 	for (double i = a; i <= b; i += h)//проходим все дискретности от a до b с шагом h
 	{

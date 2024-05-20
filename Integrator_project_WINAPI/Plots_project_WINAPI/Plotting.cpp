@@ -1,4 +1,5 @@
 #include "Plotting.h"
+
 #define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, d);
 #define LineTo(a, x, y); LineTo(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center);
 #define TextOutW(dc, x, y, s, st); TextOutW(dc, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, s, st);
@@ -12,39 +13,37 @@ void DrowSetka(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 	SetDCPenColor(dc, RGB(214, 214, 214));
 	Plotting_edges_upd(0,Wnd_Plot);
 
-	for (int ix = Wnd_Plot->setka.x_LL; ix < Wnd_Plot->setka.x_RR; ix += Wnd_Plot->setka.h_setka) {
-		MoveToEx(dc, ix, Wnd_Plot->setka.y_BB, NULL);
-		LineTo(dc, ix, Wnd_Plot->setka.y_TT);
+	for (int ix = Wnd_Plot->setka.p_x_Left; ix < Wnd_Plot->setka.p_x_Right; ix += Wnd_Plot->setka.h_setka) {
+		MoveToEx(dc, ix, Wnd_Plot->setka.p_y_Bottom, NULL);
+		LineTo(dc, ix, Wnd_Plot->setka.p_y_Top);
 	}
-	for (int iy = Wnd_Plot->setka.y_BB; iy < Wnd_Plot->setka.y_TT; iy += Wnd_Plot->setka.h_setka) {
-		MoveToEx(dc, Wnd_Plot->setka.x_LL, iy, NULL);
-		LineTo(dc, Wnd_Plot->setka.x_RR, iy);
+	for (int iy = Wnd_Plot->setka.p_y_Bottom; iy < Wnd_Plot->setka.p_y_Top; iy += Wnd_Plot->setka.h_setka) {
+		MoveToEx(dc, Wnd_Plot->setka.p_x_Left, iy, NULL);
+		LineTo(dc, Wnd_Plot->setka.p_x_Right, iy);
 	}
 	//рисуем большие клетки 
 	SetDCPenColor(dc, RGB(150, 150, 150));
-	for (int ix = Wnd_Plot->setka.x_LL5; ix < Wnd_Plot->setka.x_RR; ix += Wnd_Plot->setka.h5_setka) {
-		MoveToEx(dc, ix, Wnd_Plot->setka.y_BB5, NULL);
-		LineTo(dc, ix, Wnd_Plot->setka.y_TT);
+	for (int ix = Wnd_Plot->setka.p_x_LLeft5; ix < Wnd_Plot->setka.p_x_Right; ix += Wnd_Plot->setka.h5_setka) {
+		MoveToEx(dc, ix, Wnd_Plot->setka.p_y_BBottom5, NULL);
+		LineTo(dc, ix, Wnd_Plot->setka.p_y_Top);
 	}
-	for (int iy = Wnd_Plot->setka.y_BB5; iy < Wnd_Plot->setka.y_TT; iy += Wnd_Plot->setka.h5_setka) {
-		MoveToEx(dc, Wnd_Plot->setka.x_LL5, iy, NULL);
-		LineTo(dc, Wnd_Plot->setka.x_RR, iy);
+	for (int iy = Wnd_Plot->setka.p_y_BBottom5; iy < Wnd_Plot->setka.p_y_Top; iy += Wnd_Plot->setka.h5_setka) {
+		MoveToEx(dc, Wnd_Plot->setka.p_x_LLeft5, iy, NULL);
+		LineTo(dc, Wnd_Plot->setka.p_x_Right, iy);
 	}
 	//рисуем оси координат и кромку
 	SetDCPenColor(dc, RGB(0, 0, 0));
-	MoveToEx(dc, 0, Wnd_Plot->setka.y_TT, NULL);
-	LineTo(dc, 0, Wnd_Plot->setka.y_BB);
-	MoveToEx(dc, Wnd_Plot->setka.x_LL, 0, NULL);
-	LineTo(dc, Wnd_Plot->setka.x_RR, 0);
+	MoveToEx(dc, 0, Wnd_Plot->setka.p_y_Top, NULL);
+	LineTo(dc, 0, Wnd_Plot->setka.p_y_Bottom);
+	MoveToEx(dc, Wnd_Plot->setka.p_x_Left, 0, NULL);
+	LineTo(dc, Wnd_Plot->setka.p_x_Right, 0);
 }
-void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
+void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot, HFONT* hFont)
 {
-	HFONT hFont1 = CreateFont(11, 0, 0, 0, 600, 0, 0, 0,
-		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lusida Console");
+
 	SelectObject(dc, GetStockObject(DC_PEN));
 	SetDCPenColor(dc, RGB(0, 0, 0));
-	SelectObject(dc, hFont1);
+	SelectObject(dc, *hFont);
 	SetBkMode(dc, TRANSPARENT);
 	//рисуем числa
 	//////////////////////////////////////////////////////////////////////
@@ -62,16 +61,16 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		zerocount = 1;
 	}
 
-	double ux = Wnd_Plot->setka.u5_setka * Wnd_Plot->setka.x_LL5 / Wnd_Plot->setka.h5_setka / pow(10, mantissa);;
+	double ux = Wnd_Plot->setka.u5_setka * Wnd_Plot->setka.p_x_LLeft5 / Wnd_Plot->setka.h5_setka / pow(10, mantissa);;
 	WCHAR str_[20];
 	//проверка на вещественность иди целостность координат
 	//if (Wnd_Plot->setka.u5_setka < 1)zerocount = abs(round(log10(Wnd_Plot->setka.u5_setka))) + 1;
 	SetTextAlign(dc, TA_TOP | TA_CENTER);
 	
-	if (Wnd_Plot->setka.x_LL - Wnd_Plot->setka.x_LL5 > Wnd_Plot->setka.h5_setka / 2) 
-		Wnd_Plot->setka.x_LL5 = ((Wnd_Plot->setka.x_LL / Wnd_Plot->setka.h5_setka)) * Wnd_Plot->setka.h5_setka;
-	for (int ix = Wnd_Plot->setka.x_LL5;
-		ix < Wnd_Plot->setka.x_RR - Wnd_Plot->setka.h5_setka/2;
+	if (Wnd_Plot->setka.p_x_Left - Wnd_Plot->setka.p_x_LLeft5 > Wnd_Plot->setka.h5_setka / 2) 
+		Wnd_Plot->setka.p_x_LLeft5 = ((Wnd_Plot->setka.p_x_Left / Wnd_Plot->setka.h5_setka)) * Wnd_Plot->setka.h5_setka;
+	for (int ix = Wnd_Plot->setka.p_x_LLeft5;
+		ix < Wnd_Plot->setka.p_x_Right - Wnd_Plot->setka.h5_setka/2;
 		ix += Wnd_Plot->setka.h5_setka) {
 		if (mantissa == 0)
 			swprintf(str_, L"%.*lf", zerocount, ux);
@@ -85,13 +84,13 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		}
 		else {
 
-			TextOutW(dc, ix, (Wnd_Plot->setka.y_TT - 10), str_, wcslen(str_));//рисуем на топе доп координаты
-			MoveToEx(dc, ix, (Wnd_Plot->setka.y_TT - 10), NULL);
-			LineTo(dc, ix, (Wnd_Plot->setka.y_TT + 10));
+			TextOutW(dc, ix, (Wnd_Plot->setka.p_y_Top - 10), str_, wcslen(str_));//рисуем на топе доп координаты
+			MoveToEx(dc, ix, (Wnd_Plot->setka.p_y_Top - 10), NULL);
+			LineTo(dc, ix, (Wnd_Plot->setka.p_y_Top + 10));
 
-			TextOutW(dc, ix, (Wnd_Plot->setka.y_BB + 20), str_, wcslen(str_));
-			MoveToEx(dc, ix, (Wnd_Plot->setka.y_BB - 10), NULL);
-			LineTo(dc, ix, (Wnd_Plot->setka.y_BB + 10));
+			TextOutW(dc, ix, (Wnd_Plot->setka.p_y_Bottom + 20), str_, wcslen(str_));
+			MoveToEx(dc, ix, (Wnd_Plot->setka.p_y_Bottom - 10), NULL);
+			LineTo(dc, ix, (Wnd_Plot->setka.p_y_Bottom + 10));
 
 			TextOutW(dc, ix, -10, str_, wcslen(str_));
 			MoveToEx(dc, ix, -10, NULL);
@@ -100,11 +99,11 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		ux += Wnd_Plot->setka.u5_setka / pow(10, mantissa);
 	}
 	//уходим в отрицательное крайнее значение графика Y
-	double uy = Wnd_Plot->setka.u5_setka * Wnd_Plot->setka.y_BB5 / Wnd_Plot->setka.h5_setka / pow(10, mantissa);
+	double uy = Wnd_Plot->setka.u5_setka * Wnd_Plot->setka.p_y_BBottom5 / Wnd_Plot->setka.h5_setka / pow(10, mantissa);
 	SetTextAlign(dc, TA_LEFT);
-	if (Wnd_Plot->setka.y_BB - Wnd_Plot->setka.y_BB5 > Wnd_Plot->setka.h5_setka / 2)
-		Wnd_Plot->setka.y_BB5 = ((Wnd_Plot->setka.y_BB / Wnd_Plot->setka.h5_setka)) * Wnd_Plot->setka.h5_setka;
-	for (int iy = Wnd_Plot->setka.y_BB5; iy < Wnd_Plot->setka.y_TT - Wnd_Plot->setka.h5_setka/2; iy += Wnd_Plot->setka.h5_setka) {
+	if (Wnd_Plot->setka.p_y_Bottom - Wnd_Plot->setka.p_y_BBottom5 > Wnd_Plot->setka.h5_setka / 2)
+		Wnd_Plot->setka.p_y_BBottom5 = ((Wnd_Plot->setka.p_y_Bottom / Wnd_Plot->setka.h5_setka)) * Wnd_Plot->setka.h5_setka;
+	for (int iy = Wnd_Plot->setka.p_y_BBottom5; iy < Wnd_Plot->setka.p_y_Top - Wnd_Plot->setka.h5_setka/2; iy += Wnd_Plot->setka.h5_setka) {
 		if (mantissa == 0)
 			swprintf(str_, L"%.*lf", zerocount, uy);
 		else
@@ -116,52 +115,50 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 			MoveToEx(dc, 10, iy, NULL);
 			LineTo(dc, -10, iy);
 
-			TextOutW(dc, (Wnd_Plot->setka.x_LL + 15), iy, str_, wcslen(str_));
-			MoveToEx(dc, (Wnd_Plot->setka.x_LL + 10), iy, NULL);
-			LineTo(dc, (Wnd_Plot->setka.x_LL - 10), iy);
+			TextOutW(dc, (Wnd_Plot->setka.p_x_Left + 15), iy, str_, wcslen(str_));
+			MoveToEx(dc, (Wnd_Plot->setka.p_x_Left + 10), iy, NULL);
+			LineTo(dc, (Wnd_Plot->setka.p_x_Left - 10), iy);
 
-			TextOutW(dc, (Wnd_Plot->setka.x_RR - 20), (iy + 5), str_, wcslen(str_));
-			MoveToEx(dc, (Wnd_Plot->setka.x_RR + 10), iy, NULL);
-			LineTo(dc, (Wnd_Plot->setka.x_RR - 10), iy);
+			TextOutW(dc, (Wnd_Plot->setka.p_x_Right - 20), (iy + 5), str_, wcslen(str_));
+			MoveToEx(dc, (Wnd_Plot->setka.p_x_Right + 10), iy, NULL);
+			LineTo(dc, (Wnd_Plot->setka.p_x_Right - 10), iy);
 		}
 		uy += Wnd_Plot->setka.u5_setka / pow(10, mantissa);
 	}
 
 	//рисуем кромочку
-	MoveToEx(dc, Wnd_Plot->setka.x_LL, Wnd_Plot->setka.y_TT, NULL);
-	LineTo(dc, Wnd_Plot->setka.x_LL, Wnd_Plot->setka.y_BB);
-	MoveToEx(dc, Wnd_Plot->setka.x_RR - 1, Wnd_Plot->setka.y_TT, NULL);
-	LineTo(dc, Wnd_Plot->setka.x_RR - 1, Wnd_Plot->setka.y_BB);
-
-	DeleteObject(hFont1);
+	MoveToEx(dc, Wnd_Plot->setka.p_x_Left, Wnd_Plot->setka.p_y_Top, NULL);
+	LineTo(dc, Wnd_Plot->setka.p_x_Left, Wnd_Plot->setka.p_y_Bottom);
+	MoveToEx(dc, Wnd_Plot->setka.p_x_Right - 1, Wnd_Plot->setka.p_y_Top, NULL);
+	LineTo(dc, Wnd_Plot->setka.p_x_Right - 1, Wnd_Plot->setka.p_y_Bottom);
 }
-void DrowGraphSmooth(HDC dc, Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, Pen* Pen_for_plot)
+void DrowGraphSmooth(HDC dc, Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, Gdiplus::Pen* Pen_for_plot)
 {
 	Gdiplus::Graphics* graph = new (Gdiplus::Graphics)(dc);
 	Gdiplus::Bitmap* buffer = new (Gdiplus::Bitmap)(Wnd_Plot->sx, Wnd_Plot->sy);
 	Gdiplus::Graphics* myGraphics = new (Gdiplus::Graphics)(buffer);
-	myGraphics->SetSmoothingMode(SmoothingModeAntiAlias);
-
+	myGraphics->SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
+	int size = Myplot.myvec_xy.size() - 1;
 	int j = 0, i = 1;
-	if (Wnd_Plot->Draw_way == SIMPLE_PLOTTING) {
+	if (Myplot.Redraw == ALLOW) {
 
-		while (Myplot.myvec_xy[i].x < Wnd_Plot->setka.LLeft)
+		while (Myplot.myvec_xy[i].x < Wnd_Plot->setka.u_x_Left && i < size)
 		{
 			++i;
 		}
 		j = i;
-		while (Myplot.myvec_xy[j].x < Wnd_Plot->setka.RRight && j < Myplot.myvec_xy.size())// && j < Myplot.myvec_xy.size()
+		while (Myplot.myvec_xy[j].x < Wnd_Plot->setka.u_x_Right && j < size)
 		{
 			++j;
 		}
 	}
 	else {
-     j = Myplot.myvec_xy.size();
+     j = Myplot.picsel.size();
 	}
 
 	for (; i < j; i++)
 	{
-		if (isnan(Myplot.picsel[i - 1].y)) {
+		if (isnan(Myplot.myvec_xy[i - 1].y)) {
 			i++; continue;
 		}
 		myGraphics->DrawLine(Pen_for_plot,
@@ -180,12 +177,12 @@ void DrowGraph(HDC dc, Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot)
 {
 	SelectObject(dc, CreatePen(PS_SOLID, 5, RGB(255, 0, 50)));
 	int i = 0;
-	while (Myplot.myvec_xy[i].x < Wnd_Plot->setka.LLeft)
+	while (Myplot.myvec_xy[i].x < Wnd_Plot->setka.u_x_Left)
 	{
 		++i;
 	}
 	int j = i;
-	while (Myplot.myvec_xy[j].x < Wnd_Plot->setka.RRight)
+	while (Myplot.myvec_xy[j].x < Wnd_Plot->setka.u_x_Right)
 	{
 		++j;
 	}
@@ -193,7 +190,7 @@ void DrowGraph(HDC dc, Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot)
 	for (; i < j; i++)
 	{
 
-		if (isnan(Myplot.picsel[i - 1].y)) {
+		if (isnan(Myplot.myvec_xy[i - 1].y)) {
 			i++; continue;
 		}
 		MoveToEx(dc, Myplot.picsel[i - 1].x, Myplot.picsel[i - 1].y, NULL);

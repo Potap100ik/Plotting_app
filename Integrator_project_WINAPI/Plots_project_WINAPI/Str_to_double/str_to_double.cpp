@@ -47,6 +47,15 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипуляц
 	case TAN:
 		sprintf(str1, "%lf", tan(Function_String_to_Double(str2 + 1, x, y)));
 		break;
+	case ATAN:
+		sprintf(str1, "%lf", atan(Function_String_to_Double(str2 + 1, x, y)));
+		break;
+	case ASIN:
+		sprintf(str1, "%lf", asin(Function_String_to_Double(str2 + 1, x, y)));
+		break;
+	case ACOS:
+		sprintf(str1, "%lf", acos(Function_String_to_Double(str2 + 1, x, y)));
+		break;
 	case BRAKET:
 		sprintf(str1, "%lf", Function_String_to_Double(str2 + 1, x, y));
 		break;
@@ -217,7 +226,7 @@ int Index_of_smth(char* str)
 
 
 // y - знак первого числа в строке
-long double Function_String_to_Double(char* str, double* x, int y)
+double Function_String_to_Double(char* str, double* x, int y)
 {
 
 
@@ -475,6 +484,21 @@ long double Function_String_to_Double(char* str, double* x, int y)
 				int index = Index_of_smth(str + 3);
 				return Function_String_to_Double(StrCut(str + 3, x, y, index, ABS), x, y);
 			}
+			else if (strncmp(str, "arctan(", 7) == 0)
+			{
+				int index = Index_of_smth(str + 6);
+				return Function_String_to_Double(StrCut(str + 6, x, y, index, ATAN), x, y);
+			}
+			else if (strncmp(str, "arcsin(", 7) == 0)
+			{
+				int index = Index_of_smth(str + 6);
+				return Function_String_to_Double(StrCut(str + 6, x, y, index, ASIN), x, y);
+			}
+			else if (strncmp(str, "arccos(", 7) == 0)
+			{
+				int index = Index_of_smth(str + 6);
+				return Function_String_to_Double(StrCut(str + 6, x, y, index, ACOS), x, y);
+			}
 			break;
 		case'l':
 			if (strncmp(str, "log(", 4) == 0)
@@ -510,6 +534,11 @@ long double Function_String_to_Double(char* str, double* x, int y)
 				int index = Index_of_smth(str + 3);
 				return Function_String_to_Double(StrCut(str + 3, x, y, index, SIN), x, y);
 			}
+			else if (strncmp(str, "sqrt(", 5) == 0)
+			{
+				int index = Index_of_smth(str + 4);
+				return Function_String_to_Double(StrCut(str + 4, x, y, index, SQRT), x, y);
+			}
 			break;
 		case'c':
 			if (strncmp(str, "cos(", 4) == 0)
@@ -517,12 +546,27 @@ long double Function_String_to_Double(char* str, double* x, int y)
 				int index = Index_of_smth(str + 3);
 				return Function_String_to_Double(StrCut(str + 3, x, y, index, COS), x, y);
 			}
+			else if (strncmp(str, "ctan(", 5) == 0)
+			{
+				int index = Index_of_smth(str + 4);
+				return 1.0/Function_String_to_Double(StrCut(str + 4, x, y, index, TAN), x, y);
+			}
+			else if (strncmp(str, "ctg(", 4) == 0)
+			{
+				int index = Index_of_smth(str + 3);
+				return 1.0/Function_String_to_Double(StrCut(str + 3, x, y, index, TAN), x, y);
+			}
 			break;
 		case't':
 			if (strncmp(str, "tan(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
 				return Function_String_to_Double(StrCut(str + 3, x, y, index, TAN), x, y);
+			}
+			else if (strncmp(str, "tg(", 3) == 0)
+			{
+				int index = Index_of_smth(str + 2);
+				return Function_String_to_Double(StrCut(str + 2, x, y, index, TAN), x, y);
 			}
 			break;
 		}

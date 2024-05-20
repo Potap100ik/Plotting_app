@@ -1,7 +1,7 @@
 #pragma comment(lib, "GdiPlus.lib")
 #include "../Main_files/STD/stdafx.h"
 #include "../Main_files/STD/Standard.h"
-//#define CONSOLE
+
 
 HINSTANCE hInst;
 //MyWnd_Plot* Wnd_Plot;
@@ -13,7 +13,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 #ifdef CONSOLE
 	SetConsoleCP(1251);
 	setlocale(LC_ALL, "Rus");
-	FILE* conin = stdin;
+	FILE* conin = stdin;////////////////////////////////////////////////////////////////утечка
 	FILE* conout = stdout;
 	FILE* conerr = stderr;
 	AllocConsole();
