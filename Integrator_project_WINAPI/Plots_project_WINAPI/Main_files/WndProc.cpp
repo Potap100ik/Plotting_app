@@ -314,7 +314,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 
 	}
 	return CDRF_DODEFAULT;
-	case WM_CTLCOLORBTN:return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);////////////////////////////////////////////
+	//case WM_CTLCOLORBTN:return (LRESULT)GetSysColorBrush(COLOR_WINDOW + 1);////////////////////////////////////////////
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{

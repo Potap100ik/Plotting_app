@@ -297,13 +297,13 @@ double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot* Wnd_Plot, doubl
 		Myintegr.integral_plot.myvec_xy.push_back(point);
 		y += Myintegr.vec.myvec_xy[i].y * Wnd_Plot->setka.unit_to_pixel;
 	}
-	int x_in_center = ux_max - (ux_max - ux_min) / 2;
-	int y_in_center = uy_max - (uy_max - uy_min) / 2;
+	//int x_in_center = ux_max - (ux_max - ux_min) / 2;
+	//int y_in_center = uy_max - (uy_max - uy_min) / 2;
 	for (int i = 0; i < Myintegr.integral_plot.myvec_xy.size(); i++)
 	{
 		Myintegr.integral_plot.picsel.push_back({});
-		Myintegr.integral_plot.myvec_xy[i].y -= y_in_center;
-		Myintegr.integral_plot.myvec_xy[i].x -= x_in_center;
+		//Myintegr.integral_plot.myvec_xy[i].y -= y_in_center;
+		//Myintegr.integral_plot.myvec_xy[i].x -= x_in_center;
 
 		Myintegr.integral_plot.picsel[i].x = Myintegr.integral_plot.myvec_xy[i].x * Wnd_Plot->setka.kxy_zoom;
 		Myintegr.integral_plot.picsel[i].y = Myintegr.integral_plot.myvec_xy[i].y * Wnd_Plot->setka.kxy_zoom;

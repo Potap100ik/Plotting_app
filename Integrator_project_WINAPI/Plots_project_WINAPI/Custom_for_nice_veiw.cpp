@@ -25,7 +25,7 @@ int Get_EDIT_FUNC_koordinates(int i)
 	case 1: return 59;
 	case 2: return 32;
 	case 3: return 215;
-	case 4: return 45;
+	case 4: return 43;
 	}
 	return 0;
 }
@@ -64,10 +64,10 @@ int Get_EDIT_ERRORS_koordinates(int i)
 {
 	switch (i)
 	{
-	case 1: return 15;
-	case 2: return 302;
-	case 3: return 260;
-	case 4: return 34;
+	case 1: return 13;
+	case 2: return 299;
+	case 3: return 265;
+	case 4: return 41;
 	}
 	return 0;
 }
@@ -79,38 +79,38 @@ int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i)
 	case 1: //левая граница - х
 		switch (id)
 		{
-		case HWNDBUTTON_CLEARPLOT: return 8;
-		case HWNDBUTTON_HOME:  return 8;
+		case HWNDBUTTON_CLEARPLOT: return 13;
+		case HWNDBUTTON_HOME:  return 13;
 
-		case HWNDBUTTON_INTEGER: return 56;
-		case HWNDBUTTON_ENTER: return 56;
+		case HWNDBUTTON_INTEGER: return 61;
+		case HWNDBUTTON_ENTER: return 61;
 		}
 	case 2: //верхняя граница - y
 		switch (id)
 		{
-		case HWNDBUTTON_HOME:    return 141;
-		case HWNDBUTTON_ENTER: return 141;
+		case HWNDBUTTON_HOME:    return 145;
+		case HWNDBUTTON_ENTER: return 145;
 
-		case HWNDBUTTON_CLEARPLOT:       return 191;
-		case HWNDBUTTON_INTEGER: return 191;
+		case HWNDBUTTON_CLEARPLOT:       return 193;
+		case HWNDBUTTON_INTEGER: return 193;
 		}
 	case 3: //ширина - х
 		switch (id)
 		{
-		case HWNDBUTTON_CLEARPLOT: return 40;
-		case HWNDBUTTON_HOME:  return 40;
+		case HWNDBUTTON_CLEARPLOT: return 32;
+		case HWNDBUTTON_HOME:  return 32;
 
-		case HWNDBUTTON_INTEGER:return 225;
-		case HWNDBUTTON_ENTER:return 225;
+		case HWNDBUTTON_INTEGER:return 216;
+		case HWNDBUTTON_ENTER:return 216;
 		}
 	case 4: //высота - y
 		switch (id)
 		{
-		case HWNDBUTTON_HOME:      return 40;
-		case HWNDBUTTON_ENTER: return 40;
+		case HWNDBUTTON_HOME:      return 32;
+		case HWNDBUTTON_ENTER: return 32;
 
-		case HWNDBUTTON_CLEARPLOT:    return 40;
-		case HWNDBUTTON_INTEGER:return 40;
+		case HWNDBUTTON_CLEARPLOT:    return 32;
+		case HWNDBUTTON_INTEGER:return 32;
 		}
 	}
 	return 0;
@@ -249,12 +249,12 @@ void CustomPushBTN(HWND& hwnd, LPNMHDR some_item, HBRUSH selectbrush, HBRUSH hot
 			else
 				selectbrush = CreateSolidBrush(GetSolidColor_for_btn(SELECTBRUSH));
 
-		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, BTN_COLOR);
 
 		HGDIOBJ old_pen = SelectObject(item->hdc, pen);
 		HGDIOBJ old_brush = SelectObject(item->hdc, selectbrush);
 
-		RoundRect(item->hdc, left, top, right, bottom, 5, 5);
+		Rectangle(item->hdc, left, top, right, bottom);
 		
 		if (img != nullptr)
 		{
@@ -276,12 +276,12 @@ void CustomPushBTN(HWND& hwnd, LPNMHDR some_item, HBRUSH selectbrush, HBRUSH hot
 					hotbrush = CreateGradientBrush_in_horizont(GetGradColor_for_btn(HOTBRUSH, LEFT), GetGradColor_for_btn(HOTBRUSH, RIGHT), item);
 				else
 					hotbrush = CreateSolidBrush(GetSolidColor_for_btn(HOTBRUSH));
-			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+			HPEN pen = CreatePen(PS_INSIDEFRAME, 0, BTN_COLOR);
 
 			HGDIOBJ old_pen = SelectObject(item->hdc, pen);
 			HGDIOBJ old_brush = SelectObject(item->hdc, hotbrush);
 
-			RoundRect(item->hdc, left, top, right, bottom, 5, 5);
+			Rectangle(item->hdc, left, top, right, bottom);
 ;
 			if (img != nullptr)
 			{
@@ -300,12 +300,12 @@ void CustomPushBTN(HWND& hwnd, LPNMHDR some_item, HBRUSH selectbrush, HBRUSH hot
 			//	defaultbrush = CreateGradientBrush_in_horizont(GetGradColor_for_btn(DEFAULTBRUSH, LEFT), GetGradColor_for_btn(DEFAULTBRUSH, RIGHT), item);
 			//else
 				defaultbrush = CreateSolidBrush(GetSolidColor_for_btn(DEFAULTBRUSH));
-		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, RGB(0, 0, 0));
+		HPEN pen = CreatePen(PS_INSIDEFRAME, 0, BTN_COLOR);
 
 		HGDIOBJ old_pen = SelectObject(item->hdc, pen);
 		HGDIOBJ old_brush = SelectObject(item->hdc, defaultbrush);
 
-		RoundRect(item->hdc, left, top, right, bottom, 5, 5);
+		Rectangle(item->hdc, left, top, right, bottom);
 
 		if (img != nullptr)
 		{

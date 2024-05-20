@@ -39,10 +39,11 @@ const int Left_Wnd_Plot_Board = 300;//растояние в пикселях левой границы экрана 
 const int Width_for_background_image = Left_Wnd_Plot_Board - 10;//ШИРИНА картинки для бэкграунда
 const int len_till_main_wnd_board = 5;//расстояние от края окна с графиком до края главного окна
 //МИНИМАЛЬНЫЕ РАЗМЕРЫ ОКНА
-const int MINIMUM_BASE_WND_HEIGHT = 550;
+const int MINIMUM_BASE_WND_HEIGHT = 650;
 const int MINIMUM_BASE_WND_WIDTH = 850;
 ///////////////////////////////////////////////////////////////////
 //КАСТОМИЗАЦИЯ КНОПОК
+const COLORREF BTN_COLOR = RGB(66, 144, 218);
 enum CUSTOM_BTN {
 	SELECTBRUSH,
 	HOTBRUSH,

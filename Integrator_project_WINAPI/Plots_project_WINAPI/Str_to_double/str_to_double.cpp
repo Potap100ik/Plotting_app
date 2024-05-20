@@ -419,7 +419,7 @@ double Function_String_to_Double(char* str, double* x, int y)
 		int index = Index_of_smth(str);
 		if (strlen(str) == index + 1) {//закрывающая скобочка даного выражения была последней в строке - можно его же и возвращать, но без скобок
 			str[index] = '\0';
-			return Function_String_to_Double(str + 1, x, y);
+			return y * Function_String_to_Double(str + 1, x);
 		}
 		else if (index == 1)
 		{

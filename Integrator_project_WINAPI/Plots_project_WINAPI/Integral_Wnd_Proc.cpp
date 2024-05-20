@@ -45,8 +45,8 @@ void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, d
 
 	//CorrectSetkaPos(Wnd_Integral, Myintegr.vec);
 	CorrectSetkaPos(Wnd_Integral, Myintegr.integral_plot,MIN_H_SETKA_INT,MAX_H_SETKA_INT,BASE_H_SETKA_INT);
-	//Wnd_Integral->setka.sx_center = Wnd_Integral->sx / 2 - correct_x * Wnd_Integral->setka.kxy_zoom;
-	//Wnd_Integral->setka.sy_center = Wnd_Integral->sy / 2 - correct_y * Wnd_Integral->setka.kxy_zoom;
+	Wnd_Integral->setka.sx_center = Wnd_Integral->sx / 2 - correct_x * Wnd_Integral->setka.kxy_zoom;
+	Wnd_Integral->setka.sy_center = Wnd_Integral->sy / 2 - correct_y * Wnd_Integral->setka.kxy_zoom;
 }
 LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
