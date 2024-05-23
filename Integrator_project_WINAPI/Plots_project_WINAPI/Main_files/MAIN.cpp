@@ -1,10 +1,14 @@
 #pragma comment(lib, "GdiPlus.lib")
+#include "type.h"
+#include "../resource.h"
+#include "../Custom_for_nice_veiw.h"
+#include "WndProc.h"
 #include "../Main_files/STD/stdafx.h"
-#include "../Main_files/STD/Standard.h"
+
 
 
 HINSTANCE hInst;
-//MyWnd_Plot* Wnd_Plot;
+//Wnd_Plot_struct* Wnd_Plot;
 WCHAR WidMain_NAME[MAX_LOADSTRING] = L"MainWindow";
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
@@ -12,7 +16,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	//делаем консоль видимой для удобства - можно делать cout и дебажить как хочется - откл: закомментить #define CONSOLE
 #ifdef CONSOLE
 	SetConsoleCP(1251);
-	setlocale(LC_ALL, "Rus");
+	//setlocale(LC_ALL, "Rus");
 	FILE* conin = stdin;////////////////////////////////////////////////////////////////утечка
 	FILE* conout = stdout;
 	FILE* conerr = stderr;
@@ -22,7 +26,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	freopen_s(&conout, "CONOUT$", "w", stdout);
 	freopen_s(&conerr, "CONOUT$", "w", stderr);
 	SetConsoleTitle(L"appconsole");
-	setlocale(LC_ALL, "Rus");
+	//setlocale(LC_ALL, "Rus");
 #endif //CONSOLE
 
 	//призыв GDI+
@@ -33,9 +37,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmd
 	WNDCLASS wc{};
 	wc.hInstance = hInstance;
 	wc.lpszClassName = WidMain_NAME;
-	wc.lpfnWndProc = WinProc;
+	wc.lpfnWndProc = WndProc;
 	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.lpszMenuName = NULL;
 	wc.cbClsExtra = 0;

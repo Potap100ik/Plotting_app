@@ -1,9 +1,22 @@
-#include "Main_files/STD/stdafx.h"
-#include "Main_files/STD/Standard.h"
+#include "Integral_Wnd_Proc.h"
+#include "Main_files/type.h"
+#include "Main_files/main_header.h"
+#include "Custom_for_nice_veiw.h"
+#include "Plotting.h"
 
-
-MyWnd_Plot* Wnd_Integral;
+Wnd_Plot_struct* Wnd_Integral;
 Integral_struct Myintegr;
+
+#ifdef GLOBAL_PRINT
+void PrintGlobal_integral_wnd_cpp()
+{
+	printf("integral_wnd\n\n");
+	printf("Wnd_Integral = %llu\n", sizeof(Wnd_Integral));
+	printf("Myintegr = %llu\n", sizeof(Myintegr));
+	printf("Wnd_Plot_struct* = %llu\n", sizeof(Wnd_Plot_struct*));
+	printf("Integral_struct = %llu\n", sizeof(Integral_struct));
+}
+#endif //GLOBAL_PRINT
 
 void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, double H)
 {
@@ -14,8 +27,11 @@ void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, d
 	Myintegr.H = H;
 	//////////////////////////////////////////////
 	StructIntegralInit(Wnd_Integral,Myintegr);
-	FirstPlotting(Wnd_Integral, Myintegr.vec);
-#ifdef VECTOR_OUT
+	if (FirstPlotting(Wnd_Integral, Myintegr.vec) != 0)
+	{
+		SendMessage(Wnd_Integral->hWnd, WM_CLOSE, NULL, NULL);
+	}
+#ifdef VECTOR_OF_INTEGER_PRINT
 	{
 		int i = 0;
 		printf("Инициация построения графика\n");
@@ -25,11 +41,11 @@ void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, d
 			i++;
 		}
 	}
-#endif //VECTOR_OUT
+#endif //VECTOR_OF_INTEGER_PRINT
 	//////////////////////////////////////////////
 	double correct_x = 0, correct_y = 0;
 	double size_of_plot = FillIntegralVector(Myintegr, Wnd_Integral, correct_x, correct_y);
-#ifdef VECTOR_OUT
+#ifdef VECTOR_OF_INTEGER_PRINT
 	{
 		int i = 0;
 		printf("Инициация построения графика\n");
@@ -39,7 +55,7 @@ void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, d
 			i++;
 		}
 	}
-#endif //VECTOR_OUT
+#endif //VECTOR_OF_INTEGER_PRINT
 
 	Wnd_Integral->setka.u5_setka = Setka_UNIT_CHANGE(size_of_plot / KOL_OF_SETKA_SQARES5);
 
@@ -55,7 +71,7 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	HDC memdc;
 	HBITMAP membit;
 	HDC hdc2{};
-	static MouseMove MyMouse;
+	static SMouseMove MyMouse;
 	static Gdiplus::Pen* Pen_for_INTEGRAL;
 	static HFONT hFont1;
 	///////////////////////////////////////////////////
@@ -65,7 +81,7 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	{
 		Pen_for_INTEGRAL = GetPen_for_Integral();
 
-		Wnd_Integral = (MyWnd_Plot*)malloc(sizeof(Wnd_Plot_struct));
+		Wnd_Integral = (Wnd_Plot_struct*)malloc(sizeof(Wnd_Plot_struct));
 
 		MousePos(FALSE, 0, 0, MyMouse);
 
@@ -140,7 +156,7 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 
 		Myintegr.vec.myvec_xy.clear();
 		Myintegr.vec.picsel.clear();
-
+		free(Wnd_Integral);
 		delete Pen_for_INTEGRAL;
 		DeleteObject(hFont1);
 	}return 0;

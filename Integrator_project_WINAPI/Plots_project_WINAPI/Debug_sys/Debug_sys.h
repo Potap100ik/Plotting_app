@@ -1,6 +1,12 @@
 #pragma once
 #include <chrono>
 #include <iostream>
+
+void PrintGlobal_mainfunc_cpp();
+void PrintGlobal_WndProc_cpp();
+void PrintGlobal_integral_wnd_cpp();
+void PrintGlobal_winplot_proc_cpp();
+
 class SimpleTimer
 
 {

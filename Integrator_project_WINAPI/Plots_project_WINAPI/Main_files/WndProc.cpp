@@ -1,13 +1,16 @@
-#include "../Main_files/STD/stdafx.h"
-#include "../Main_files/STD/Standard.h"
+#include "WndProc.h"
+
+#include "type.h"
+#include "../Custom_for_nice_veiw.h"
+#include "../Integral_Wnd_Proc.h"
+#include "../WinPlot_Proc.h"
+#include "main_header.h"
+#include "../Error.h"
+
 
 WCHAR Win_Plot_NAME[MAX_LOADSTRING] = L"PlotWindow";//классовое имя окна с графиком
 WCHAR Integral_Wnd_NAME[MAX_LOADSTRING] = L"Integral_Wnd";//классовое имя окна с графиком интеграла
 //МЕСТНЫЕ СТАТИЧЕСКИЕ ФУНКЦИИ
-LPVOID CreateControls(HWND hWnd);
-void EditInit();
-ATOM Register_Main_Plot_Wnd_Class();
-ATOM Register_Integer_Wnd_Class();
 
 //extern - так делать нельзя, но я по-другому пока не умею
 extern HINSTANCE hInst;//контекст приложения для создания кнопок, окон и прочего - инициализация в мейн.сррр
@@ -28,13 +31,34 @@ hWndEdit_H{},
 hWndEdit_Integral{},
 hWndEdit_Erroors{};
 
+
+#ifdef GLOBAL_PRINT
+void PrintGlobal_WndProc_cpp()
+{
+	printf("WndProc\n");
+	printf("hWndButton_enter = %llu\n", sizeof(hWndButton_enter));
+	printf("hWndButton_clearPlot = %llu\n", sizeof(hWndButton_clearPlot));
+	printf("hWndButton_Integral = %llu\n", sizeof(hWndButton_Integral));
+	printf("hWndButton_home = %llu\n", sizeof(hWndButton_home));
+	printf("hWndEdit_base = %llu\n", sizeof(hWndEdit_base));
+	printf("hWndEdit_A = %llu\n", sizeof(hWndEdit_A));
+	printf("hWndEdit_B = %llu\n", sizeof(hWndEdit_B));
+	printf("hWndEdit_H = %llu\n", sizeof(hWndEdit_H));
+	printf("hWndEdit_Integral = %llu\n", sizeof(hWndEdit_Integral));
+	printf("hWndEdit_erroors = %llu\n", sizeof(hWndEdit_Erroors));
+	printf("hInst = %llu\n", sizeof(hInst)); Win_Plot_NAME;
+	printf("Win_Plot_NAME = %llu\n", sizeof(Win_Plot_NAME));
+	printf("Integral_Wnd_NAME = %llu\n", sizeof(Integral_Wnd_NAME));
+}
+#endif //GLOBAL_PRINT
+
 void EditInit()
 {
-	SetWindowText(hWndEdit_base, L"sin(x)");//log(x)//sin(x)*abs(x)//x*x/10
+	SetWindowText(hWndEdit_base, L"sin(x)*abs(x)*tg(x^2)");//log(x)//sin(x)*abs(x)//x*x/10
 	SetWindowText(hWndEdit_A, L"0");
 	SetWindowText(hWndEdit_B, L"10");
 	SetWindowText(hWndEdit_H, L"0.1");
-	SetWindowText(hWndEdit_Integral, L"Здесь появится значение интеграла");
+	SetWindowText(hWndEdit_Integral, L"Значение интеграла");
 	SetWindowText(hWndEdit_Erroors, L"Ошибки:");
 }
 LPVOID CreateControls(HWND hWnd)//магия создания кнопок и других контролов
@@ -104,7 +128,7 @@ LPVOID CreateControls(HWND hWnd)//магия создания кнопок и других контролов
 	hWndEdit_base = CreateWindow(
 		L"EDIT",
 		L"log(x)",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL  | ES_LEFT | ES_MULTILINE,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
 		Get_EDIT_FUNC_koordinates(1),
 		Get_EDIT_FUNC_koordinates(2),
 		Get_EDIT_FUNC_koordinates(3),
@@ -122,7 +146,7 @@ LPVOID CreateControls(HWND hWnd)//магия создания кнопок и других контролов
 		0,
 		L"EDIT",
 		L"1",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE ,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
 		Get_EDIT_ABH_koordinates('A', 1),
 		Get_EDIT_ABH_koordinates('A', 2),
 		Get_EDIT_ABH_koordinates('A', 3),
@@ -139,7 +163,7 @@ LPVOID CreateControls(HWND hWnd)//магия создания кнопок и других контролов
 		0,
 		L"EDIT",
 		L"10",
-		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE ,
+		WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | ES_LEFT | ES_MULTILINE,
 		Get_EDIT_ABH_koordinates('B', 1),
 		Get_EDIT_ABH_koordinates('B', 2),
 		Get_EDIT_ABH_koordinates('B', 3),
@@ -227,7 +251,7 @@ ATOM Register_Main_Plot_Wnd_Class()
 }
 
 //оконные процедуры
-LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 {
 
 	HDC hdc;//контекст устройства для рисования в этом окне
@@ -240,7 +264,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	static int img_side_width;
 
 	Gdiplus::Graphics* graph;//переменная для рисования картинок в окне
-	
+
 	//кисти для закрашивания кнопок
 	static HBRUSH defaultbrush;//базовое состояние
 	static HBRUSH selectbrush;//нажание на кнопку
@@ -263,20 +287,35 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		if (!Register_Integer_Wnd_Class())
 			MessageBox(NULL, L"НЕ ВЫШЕЛ ПУШНЫЙ ГРАФИК ПОГУЛЯТЬ", L"Ошибка", MB_OK);
 		/////////////////////////////////////////////////////////////////////////////
-		
-#pragma warning(suppress:6011)//нелогичная ошибка разыменования пустого указателы(несмотря на инициализацию сверху)
 		hWndChild_Plot = CreateWindow(Win_Plot_NAME, NULL,
 			WS_CHILD | WS_DLGFRAME | WS_VISIBLE,
-			0, 0, 0, 0, 
+			0, 0, 0, 0,
 			hWnd, NULL, hInst, NULL);
 		createwindow_mainplot = true;
 		/////////////////////////////////////////////////////////////////////////////
 		img_side = Gdiplus::Bitmap::FromFile(Side_image_adress);
-		img_side_height = img_side->GetHeight() * (Width_for_background_image) / img_side->GetWidth();
-		img_side_width = Width_for_background_image;
-		/////////////////////////////////////////////////////////////////////////////
 		img_homebutton = Gdiplus::Bitmap::FromFile(Image_Home_btn);
 		img_clearbutton = Gdiplus::Bitmap::FromFile(Image_CLEAR_btn);
+		if (CheckImageOpening(img_side, img_homebutton, img_clearbutton, hWnd))
+		{
+			SendMessage(hWnd, WM_DESTROY, NULL, NULL);
+			return 1;
+		}
+		img_side_height = img_side->GetHeight() * (Width_for_background_image) / img_side->GetWidth();
+		img_side_width = Width_for_background_image;
+#ifdef GLOBAL_PRINT
+		PrintGlobal_WndProc_cpp();
+		printf("img_side = %llu\n", sizeof(img_side));
+		printf("img_clearbutton = %llu\n", sizeof(img_clearbutton));
+		printf("img_homebutton = %llu\n", sizeof(img_homebutton));
+		printf("img_side_height = %llu\n", sizeof(img_side_height));
+		printf("img_side_width = %llu\n", sizeof(img_side_width));
+		printf("defaultbrush = %llu\n", sizeof(defaultbrush));
+		printf("img_siselectbrushde = %llu\n", sizeof(selectbrush));
+		printf("hotbrush = %llu\n", sizeof(hotbrush));
+		printf("Plot_WndSize = %llu\n", sizeof(Plot_WndSize));
+		printf("createwindow_mainplot = %llu\n", sizeof(createwindow_mainplot));
+#endif //GLOBAL_PRINT
 	}return 0;
 	case WM_GETMINMAXINFO:
 	{
@@ -286,9 +325,9 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 	}return 0;
 	case WM_SIZE:
 	{
-#ifdef CONSOLE
+#ifdef SIZE_PRINT
 		printf("sx = %5d sy = %5d\n", LOWORD(lParam), HIWORD(lParam));
-#endif //CONSOLE
+#endif //SIZE_PRINT
 		Plot_WndSize.x = LOWORD(lParam) - Left_Wnd_Plot_Board - len_till_main_wnd_board;
 		Plot_WndSize.y = HIWORD(lParam) - len_till_main_wnd_board;
 		MoveWindow(hWndChild_Plot, Left_Wnd_Plot_Board, 0, Plot_WndSize.x, Plot_WndSize.y, TRUE);
@@ -320,24 +359,21 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		{
 		case HWNDBUTTON_ENTER:
 		{
-			std::wstring text;//вводимое значение функции
-			LPSTR text_;
-			text.clear();
-			text.reserve(MAX_LOADSTRING);
-			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
-			text.erase(remove(text.begin(), text.end(), 0), text.end());
-			text_ = Wide_into_Ascii(text.c_str());
+			SetWindowText(hWndEdit_Erroors, L"Ошибки:");
+			LPWSTR w_text_ = (LPWSTR)malloc(MAX_LOADSTRING);
+			GetWindowText(hWndEdit_base, w_text_, MAX_LOADSTRING - 1);
+			LPSTR text_ = Wide_into_Ascii(w_text_);
 			if (strlen(text_) == 0)
 			{
-#ifdef CONSOLE
-				MessageBox(hWnd, L"Уважаемый прогер\nГде ваша функция?", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
-#else 
-				SetWindowText(hWndEdit_Erroors, L"Где ваша функция?");
-#endif //CONSOLE
-				return 0;
+				MessageBox(hWnd, L"Уважаемый прогер\nГде ваша функция?", L"Внимание, котики", MB_OK | MB_ICONSTOP);
+				SetWindowText(hWndEdit_Integral, L"Интеграл пока не равен");
+				SetWindowText(hWndEdit_Erroors, L"Введите функцию");
+				return 1;
 			}
 			////////////////////////////////////////////////////////////
 			SendMessageW(hWndChild_Plot, WM_DRAW_MAIN_PLOT, (WPARAM)text_, NULL);
+			free(w_text_);
+			//free(text_);
 			UpdateWindow(hWndChild_Plot);
 			InvalidateRect(hWndChild_Plot, NULL, TRUE);
 		}return 0;
@@ -345,55 +381,58 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		{
 			///////////////////////////////////////?????????????????????????????????????????????????????
 			SendMessageW(hWndChild_Plot, WM_CLEAR_PLOT, NULL, NULL);
-			SetWindowText(hWndEdit_Integral, L"");
-			SetWindowText(hWndEdit_Erroors, L"");
+			SetWindowText(hWndEdit_Integral, L"Значение интеграла");
+			SetWindowText(hWndEdit_Erroors, L"Ошибки:");
 			SendMessageW(hWndChild_Integral, WM_CLOSE, 0, 0);
 			InvalidateRect(hWndChild_Plot, NULL, TRUE);
 		}return 0;
 		case HWNDBUTTON_INTEGER:
 		{
-			std::wstring text;//вводимое значение функции
-			LPSTR text_ = (LPSTR)malloc(MAX_LOADSTRING);
-			double A, B, H;
-			std::wstring Astr, Bstr, Hstr;
-			text.clear();
-			Astr.reserve(MAX_LOADSTRING);
-			Bstr.reserve(MAX_LOADSTRING);
-			Hstr.reserve(MAX_LOADSTRING);
-			text.reserve(MAX_LOADSTRING);
-
-			GetWindowText(hWndEdit_A, &Astr[0], MAX_LOADSTRING);
-			GetWindowText(hWndEdit_B, &Bstr[0], MAX_LOADSTRING);
-			GetWindowText(hWndEdit_H, &Hstr[0], MAX_LOADSTRING);
-			GetWindowText(hWndEdit_base, &text[0], MAX_LOADSTRING);
-			try
-			{
-				A = std::stod(Astr);
-				B = std::stod(Bstr);
-				H = std::stod(Hstr);
-			}
-			catch (...)
-			{
-#ifdef CONSOLE
-				MessageBox(hWnd, L"Уважаемый прогер\nГде числа?!!!\nИз чего интегралы строить", L"Внимание, котики", MB_RETRYCANCEL | MB_ICONSTOP);
-#endif //CONSOLE
-				SetWindowText(hWndEdit_Integral, L"Err: Интеграл пока не равен");
-				return 0;
-			}
-
-			text_ = Wide_into_Ascii(text.c_str());
-			if (CheckValues_of_edit(A, B, H, hWnd, hWndEdit_Integral, text_))
-				return 0;
-			//////////////////////////////////////////////////////////////////////////////////////////////////////////
 			if (hWndChild_Integral != NULL) DestroyWindow(hWndChild_Integral);
+			SetWindowText(hWndEdit_Erroors, L"Ошибки:");
+
+			LPWSTR w_text_ = (LPWSTR)malloc(MAX_LOADSTRING);
+			double A, B, H;
+			LPWSTR A_wstr = (LPWSTR)malloc(MAX_LOADSTRING);
+			LPWSTR B_wstr = (LPWSTR)malloc(MAX_LOADSTRING);
+			LPWSTR H_wstr = (LPWSTR)malloc(MAX_LOADSTRING);
+
+			GetWindowText(hWndEdit_A, A_wstr, MAX_LOADSTRING);
+			GetWindowText(hWndEdit_B, B_wstr, MAX_LOADSTRING);
+			GetWindowText(hWndEdit_H, H_wstr, MAX_LOADSTRING);
+			GetWindowText(hWndEdit_base, w_text_, MAX_LOADSTRING);
+
+			if (CheckOnlyNumbers(A_wstr, B_wstr, H_wstr, hWndEdit_Erroors, hWnd, hWndEdit_Integral) != 0 && A_wstr != 0) {
+				return 1;
+			}
+			if (A_wstr != 0 && B_wstr != 0 && H_wstr != 0)
+			{
+				A = std::stod(A_wstr);
+				B = std::stod(B_wstr);
+				H = std::stod(H_wstr);
+			}
+
+
+
+			LPSTR text_ = Wide_into_Ascii(w_text_);
+			if (CheckValues_of_edit(A, B, H, hWnd, hWndEdit_Integral, text_)) {
+				return 0;
+			}
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 			RECT rc; GetWindowRect(hWnd, &rc);
-			
+
 			hWndChild_Integral = CreateWindowEx(0, Integral_Wnd_NAME, L"График интеграла функции",
 				WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_SYSMENU | WS_THICKFRAME | WS_POPUP | WS_CAPTION | WS_VISIBLE,
-				Left_Wnd_Plot_Board + rc.left,  rc.top + 30, Plot_WndSize.x / 2.1, Plot_WndSize.y / 2.1,
+				Left_Wnd_Plot_Board + rc.left, rc.top + 30, Plot_WndSize.x / 2.1, Plot_WndSize.y / 2.1,
 				hWnd, NULL, hInst, nullptr);
 
-			WND_Integral_Init(hWndChild_Integral, text_,A,B,H);
+			WND_Integral_Init(hWndChild_Integral, text_, A, B, H);
+			free(w_text_);
+			//free(text_);
+			free(A_wstr);
+			free(B_wstr);
+			free(H_wstr);
 			InvalidateRect(hWndChild_Integral, NULL, TRUE);
 		}return 0;
 		case HWNDBUTTON_HOME:
@@ -405,34 +444,32 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	case WM_MOUSEMOVE:
 	{
-#ifdef CONSOLE
+#ifdef MOUSE_KOORDITNATES_PRINT
 		printf("x: %5d y: %5d\n", LOWORD(lParam), HIWORD(lParam));
-#endif //CONSOLE
+#endif //MOUSE_KOORDITNATES_PRINT
 	}return 0;
 	case WM_ERASEBKGND:return 1;//не надо белым закрашивать при перерисовке целое окно
 	case WM_PAINT:
 	{
-
 		hdc = BeginPaint(hWnd, &ps);
 		graph = new Gdiplus::Graphics(hdc);
 		graph->Clear(BACKGROUND_COLOR);
 		graph->DrawImage(img_side, 0, 0, img_side_width, img_side_height);
 		delete graph;
 		EndPaint(hWnd, &ps);
-
 	}return 0;
 	case WM_DESTROY:
 	{
-		delete img_side;
-		delete img_clearbutton;
-		delete img_homebutton;
+		if (img_side != 0)delete img_side;
+		if (img_clearbutton != 0)delete img_clearbutton;
+		if (img_homebutton != 0)delete img_homebutton;
 		DeleteObject(defaultbrush);
 		DeleteObject(selectbrush);
 		DeleteObject(hotbrush);
 		DeleteObject(hFont1);
 		PostQuitMessage(0);
 	}return 0;
-		
+
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
-}
+	}

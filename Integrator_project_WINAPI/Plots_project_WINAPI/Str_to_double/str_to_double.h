@@ -9,13 +9,14 @@
 //#define DEBUG
 const double M_E = 2.71828182845904523;
 const double M_PI = 3.1415926535897932;
+const double M_PI2 = M_PI /2;
 
 
 using namespace std;
 
 enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, BRAKET, E, PI, XX, ATAN, ASIN, ACOS};
 
-double Function_String_to_Double(char* str, double* x, int y = 1);
+double Function_String_to_Double(char* str, double* x, int y = 1, bool can_delete_str = true);
 int Index_of_smth(char* str);
 int Index_of_smth(char* str, char ch1, char ch2);
 int Index_of_smth(char* str, char ch1, char ch2, char ch3);

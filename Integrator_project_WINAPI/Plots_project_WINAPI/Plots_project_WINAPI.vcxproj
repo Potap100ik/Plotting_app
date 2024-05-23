@@ -104,10 +104,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Visual Leak Detector\lib\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,12 +132,16 @@
     <ClInclude Include="Custom_for_nice_veiw.h" />
     <ClInclude Include="Debug_sys\Debug_sys.h" />
     <ClInclude Include="Debug_sys\Neudachi.h" />
+    <ClInclude Include="Error.h" />
     <ClInclude Include="Integral_Wnd_Proc.h" />
     <ClInclude Include="Integrate\Simps_meth.h" />
+    <ClInclude Include="Main_files\const_sys.h" />
     <ClInclude Include="Main_files\lib_struct.h" />
     <ClInclude Include="Main_files\main_header.h" />
-    <ClInclude Include="Main_files\STD\Standard.h" />
+    <ClInclude Include="Main_files\STD\Standard_.h" />
     <ClInclude Include="Main_files\STD\stdafx.h" />
+    <ClInclude Include="Main_files\type.h" />
+    <ClInclude Include="Main_files\WndProc.h" />
     <ClInclude Include="Plotting.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Str_to_double\char_change.h" />
@@ -147,8 +153,10 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="5260316_analytics_box_chart_diagram_graph_icon.ico" />
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Debug_sys\debug_main_console.cpp" />
     <ClCompile Include="Integral_Wnd_Proc.cpp" />
     <ClCompile Include="Integrate\Simps_meth.cpp" />
     <ClCompile Include="Main_files\MAIN.cpp" />
@@ -157,6 +165,7 @@
     <ClCompile Include="Main_files\WndProc.cpp" />
     <ClCompile Include="Plotting.cpp" />
     <ClCompile Include="Custom_for_nice_veiw.cpp" />
+    <ClCompile Include="Error.cpp" />
     <ClCompile Include="Str_to_double\char_change.cpp" />
     <ClCompile Include="Str_to_double\str_to_double.cpp" />
     <ClCompile Include="WinPlot_Proc.cpp" />

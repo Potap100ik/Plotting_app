@@ -1,6 +1,7 @@
 #pragma once
+#include "Main_files/type.h"
 #include "Main_files/STD/stdafx.h"
-#include "Main_files/STD/Standard.h"
+
 /////////////////////////////////////////////////////////
 // КОНСТАНТЫ ДЛА ОКНА ИНТЕГРАЛА
 const int BASE_H_SETKA_INT = 8;//размер в пикселях ширины одного маленького сеточного квадрата
@@ -18,7 +19,6 @@ const int BASE_U5_SETKA = 2;
 
 /////////////////////////////////////////////////////
 //КОНСТАНТЫ ДЛЯ ГЛАВНОГО ОКНА
-const int SYSTEMMETRICS = GetSystemMetrics(SM_CXSCREEN);
 const Gdiplus::Color BACKGROUND_COLOR = Gdiplus::Color(255,11, 24, 69);
 //ФУНКЦИИ КАСТОМИЗАЦИИ ГЛАВНОГО ОКНА
 //УСТАНОВЛЕНИЕ КООРДИНАТ КОНТРОЛОВ (В ПИКСЕЛЯХ)

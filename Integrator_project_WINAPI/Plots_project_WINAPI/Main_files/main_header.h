@@ -1,28 +1,28 @@
 #pragma once
-#include "lib_struct.h"
+#include "type.h"
 #include "STD/stdafx.h"
-#include "STD/Standard.h"
+
 
 //оконные процедуры
-LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
+
 //исполнительные функции
-void Plotting_edges_upd(int, MyWnd_Plot*);
+void Plotting_edges_upd(int, Wnd_Plot_struct*);
 double Setka_UNIT_CHANGE(double get_value);//придвигает кратность юнита сетки графика к 1,2 или 5
 LPSTR Wide_into_Ascii(LPCWSTR sw);
-void SetkaStructUpdate(MyWnd_Plot* Wnd_Plot, int new_h_setka, double new_u5_setka);
-void StructPlotInit(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
-void StructIntegralInit(MyWnd_Plot* Wnd_Plot, Integral_struct& Myintegr);
-void Wide_for_vector_upd(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
+void SetkaStructUpdate(Wnd_Plot_struct* Wnd_Plot, int new_h_setka, double new_u5_setka);
+void StructPlotInit(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot);
+void StructIntegralInit(Wnd_Plot_struct* Wnd_Plot, Integral_struct& Myintegr);
+void Wide_for_vector_upd(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot);
 
-void CorrectSetkaPos(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot, int h_min, int h_max, int h_baza);
-void MousePos(BOOL, int, int, MouseMove&);
-void FirstPlotting(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
-void RedrawPlot(MyWnd_Plot* Wnd_Plot, Ploting_struct& Myplot);
-double FillIntegralVector(Integral_struct& Myintegr, MyWnd_Plot* Wnd_Plot, double& correct_x, double& correct_y);
+void CorrectSetkaPos(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, int h_min, int h_max, int h_baza);
+void MousePos(BOOL, int, int, SMouseMove&);
+int FirstPlotting(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot);
+void RedrawPlot(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot);
+double FillIntegralVector(Integral_struct& Myintegr, Wnd_Plot_struct* Wnd_Plot, double& correct_x, double& correct_y);
 int CheckValues_of_edit(double A, double B, double H, HWND hWnd, HWND hWndEdit_Integral, LPSTR text_);
 
 //оконные процедуры
-LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM	lParam);
 LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 //

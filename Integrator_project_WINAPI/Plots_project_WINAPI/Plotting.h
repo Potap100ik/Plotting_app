@@ -1,6 +1,6 @@
 #pragma once
 #include "Main_files/STD/stdafx.h"
-#include "Main_files/STD/Standard.h"
+#include "Main_files/type.h"
 
 void DrowSetka(HDC, Wnd_Plot_struct*);
 void DrowCounts(HDC, Wnd_Plot_struct*, HFONT*);

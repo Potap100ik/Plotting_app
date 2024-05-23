@@ -1,5 +1,5 @@
-#include "Main_files/STD/stdafx.h"
-#include "Main_files/STD/Standard.h"
+#include "Custom_for_nice_veiw.h"
+#include "Main_files/type.h"
 //////////////////////////////////////////////////////
 //ÖÂÅÒ ÄËß ÃĞÀÔÈÊÎÂ
 Gdiplus::Pen* GetPen_for_Integral()

@@ -1,8 +1,23 @@
-#include "Main_files/STD/stdafx.h"
-#include "Main_files/STD/Standard.h"
+#include "WinPlot_Proc.h"
+#include "Main_files/type.h"
+#include "Main_files/main_header.h"
+#include "Custom_for_nice_veiw.h"
+#include "Plotting.h"
 
-MyWnd_Plot* Wnd_Plot;
+
+Wnd_Plot_struct* Wnd_Plot;
 Ploting_struct Myplot;
+
+#ifdef GLOBAL_PRINT
+void PrintGlobal_winplot_proc_cpp()
+{
+	printf("winplot_proc\n\n");
+	printf("Wnd_Plot = %llu\n", sizeof(Wnd_Plot));
+	printf("Myplot = %llu\n", sizeof(Myplot));
+	printf("Wnd_Plot_struct = %llu\n", sizeof(Wnd_Plot_struct));
+	printf("Ploting_struct = %llu\n", sizeof(Ploting_struct));
+}
+#endif //GLOBAL_PRINT
 
 void MainPlot_Init(HWND hWnd_MainPlot)
 {
@@ -12,7 +27,7 @@ void MainPlot_Init(HWND hWnd_MainPlot)
 LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-	static MouseMove MyMouse;//отслеживание передвижения мыщц мыши
+	static SMouseMove MyMouse;//отслеживание передвижения мыщц мыши
 
 	PAINTSTRUCT  ps2;
 	HDC memdc;
@@ -27,7 +42,7 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		Pen_for_plot = GetPen_for_Main_Plot();
 
-		Wnd_Plot = (MyWnd_Plot*)malloc(sizeof(Wnd_Plot_struct));
+		Wnd_Plot = (Wnd_Plot_struct*)malloc(sizeof(Wnd_Plot_struct));
 
 		MousePos(FALSE, 0, 0, MyMouse);
 
@@ -64,18 +79,22 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		Wnd_Plot->text_ = (LPSTR)wParam;
 		Plotting_edges_upd(2, Wnd_Plot);//ОБНОВЛЯЕМ ГРАНИЦЫ ПИКСЕЛЬНЫЕ ДЛЯ ТОГО, ЧТОБЫ ПОНЯТЬ...................
-		FirstPlotting(Wnd_Plot, Myplot);
-//#ifdef VECTOR_OUT
-//		{
-//			int i = 0;
-//			printf("Инициация построения графика\n");
-//			for (Pointer it : Myplot.myvec_xy)
-//			{
-//				printf("%5d)x = %10.6lf y = %10.6lf\n", i, it.x, it.y);
-//				i++;
-//			}
-//		}
-//#endif //VECTOR_OUT
+		if (FirstPlotting(Wnd_Plot, Myplot) != 0) {
+			Myplot.myvec_xy.clear();
+			Myplot.picsel.clear();
+			return 0;
+		}
+#ifdef VECTOR_OF_MAIN_PLOT_PRINT
+		{
+			int i = 0;
+			printf("Инициация построения графика\n");
+			for (Pointer it : Myplot.myvec_xy)
+			{
+				printf("%5d)x = %10.6lf y = %10.6lf\n", i, it.x, it.y);
+				i++;
+			}
+		}
+#endif //VECTOR_OF_MAIN_PLOT_PRINT
 	}return 0;	
 	case WM_HOME_BTN_CLICKED:
 	{
@@ -135,11 +154,12 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}return 0;
 	case WM_DESTROY:
 	{
-		free(Wnd_Plot);
+		
 		Myplot.picsel.clear();
 		Myplot.myvec_xy.clear();
-		//delete Pen_for_plot;
+		delete Pen_for_plot;
 		DeleteObject(hFont1);
+		free(Wnd_Plot);
 		PostQuitMessage(0);
 	}return 0;
 	default: return DefWindowProc(hWnd, message, wParam, lParam);
