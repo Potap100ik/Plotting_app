@@ -64,8 +64,7 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипул€ц
 		case TAN:
 		{
 			double fx = Function_String_to_Double(str2, x);
-			int k = 100;
-			if ((int)(((int)((fx + M_PI2) / M_PI) - (fx + M_PI2) / M_PI) * k) == 0) {
+			if ((int)(((int)((fx + M_PI2) / M_PI) - (fx + M_PI2) / M_PI) * TOCHNOST_FOR_TANGENS_INF) == 0) {
 				double nani = NAN;
 				throw(nani);
 			}
@@ -73,8 +72,22 @@ char* StrCut(char* str, double* x, int y, int const index, FUNC en) {//манипул€ц
 				sprintf(str1, "%lf", y * tan(fx));
 		}
 		break;
+		case CTAN:
+		{
+			double fx = Function_String_to_Double(str2, x);
+			if ((int)(((int)(fx / M_PI) - (fx / M_PI)) * TOCHNOST_FOR_TANGENS_INF) == 0) {
+				double nani = NAN;
+				throw(nani);
+			}
+			else
+				sprintf(str1, "%lf", y * 1.0 / tan(fx));
+		}
+		break;
 		case ATAN:
 			sprintf(str1, "%lf", y * atan(Function_String_to_Double(str2, x)));
+			break;
+		case ACTAN:
+			sprintf(str1, "%lf", M_PI2 - y * atan(Function_String_to_Double(str2, x)));
 			break;
 		case ASIN:
 			sprintf(str1, "%lf", y * asin(Function_String_to_Double(str2, x)));
@@ -572,6 +585,24 @@ double Function_String_to_Double(char* str, double* x, int y, bool can_delete_st
 				strcpy(str_, str + 6); if (can_delete_str)free(str);
 				return Function_String_to_Double(StrCut(str_, x, y, index, ATAN), x);
 			}
+			else if (strncmp(str, "arctg(", 6) == 0)
+			{
+				int index = Index_of_smth(str + 5);
+				strcpy(str_, str + 5); if (can_delete_str)free(str);
+				return Function_String_to_Double(StrCut(str_, x, y, index, ATAN), x);
+			}
+			else if (strncmp(str, "arcctg(", 7) == 0)
+			{
+				int index = Index_of_smth(str + 6);
+				strcpy(str_, str + 6); if (can_delete_str)free(str);
+				return Function_String_to_Double(StrCut(str_, x, y, index, ACTAN), x);
+			}
+			else if (strncmp(str, "arccot(", 7) == 0)
+			{
+				int index = Index_of_smth(str + 6);
+				strcpy(str_, str + 6); if (can_delete_str)free(str);
+				return Function_String_to_Double(StrCut(str_, x, y, index, ACTAN), x);
+			}
 			else if (strncmp(str, "arcsin(", 7) == 0)
 			{
 				int index = Index_of_smth(str + 6);
@@ -651,13 +682,13 @@ double Function_String_to_Double(char* str, double* x, int y, bool can_delete_st
 			{
 				int index = Index_of_smth(str + 4);
 				strcpy(str_, str + 4); if (can_delete_str)free(str);
-				return 1.0 / (Function_String_to_Double(StrCut(str_, x, y, index, TAN), x));
+				return Function_String_to_Double(StrCut(str_, x, y, index, CTAN), x);
 			}
 			else if (strncmp(str, "ctg(", 4) == 0)
 			{
 				int index = Index_of_smth(str + 3);
 				strcpy(str_, str + 3); if (can_delete_str)free(str);
-				return 1.0 / (Function_String_to_Double(StrCut(str_, x, y, index, TAN), x));
+				return Function_String_to_Double(StrCut(str_, x, y, index, CTAN), x);
 			}
 		}
 		break;

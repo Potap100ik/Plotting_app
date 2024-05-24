@@ -1,5 +1,6 @@
 #include "WndProc.h"
 
+#include "../resource.h"
 #include "type.h"
 #include "../Custom_for_nice_veiw.h"
 #include "../Integral_Wnd_Proc.h"
@@ -54,7 +55,7 @@ void PrintGlobal_WndProc_cpp()
 
 void EditInit()
 {
-	SetWindowText(hWndEdit_base, L"sin(x)*abs(x)*tg(x^2)");//log(x)//sin(x)*abs(x)//x*x/10
+	SetWindowText(hWndEdit_base, L"sin(x)*abs(x)");//log(x)//sin(x)*abs(x)//x*x/10
 	SetWindowText(hWndEdit_A, L"0");
 	SetWindowText(hWndEdit_B, L"10");
 	SetWindowText(hWndEdit_H, L"0.1");
@@ -233,6 +234,7 @@ ATOM Register_Integer_Wnd_Class()
 	wcex.lpszClassName = Integral_Wnd_NAME;
 	wcex.lpfnWndProc = Integral_Wnd_Proc;
 	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hIcon = LoadIcon(hInst, MAKEINTRESOURCE(IDI_ICON1));
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
 	wcex.hInstance = hInst;
 	return RegisterClassEx(&wcex);

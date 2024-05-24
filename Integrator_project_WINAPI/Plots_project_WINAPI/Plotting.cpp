@@ -1,4 +1,5 @@
 #include "Plotting.h"
+#include "Custom_for_nice_veiw.h"
 #include "Main_files/main_header.h"
 
 #define MoveToEx(a, x, y, d); MoveToEx(a, x + Wnd_Plot->setka.sx_center, y*(-1) + Wnd_Plot->setka.sy_center, d);
@@ -8,10 +9,10 @@
 void DrowSetka(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 {
 	SelectObject(dc, GetStockObject(DC_BRUSH));
-	SetDCBrushColor(dc, RGB(255, 255, 255));
+	SetDCBrushColor(dc, BCKGRND_SETKA_COLOR);
 	Rectangle(dc, 0, 0, Wnd_Plot->sx, Wnd_Plot->sy);
 	SelectObject(dc, GetStockObject(DC_PEN));
-	SetDCPenColor(dc, RGB(214, 214, 214));
+	SetDCPenColor(dc, SMALL_SETKA_SQARE_COLOR);
 	Plotting_edges_upd(0,Wnd_Plot);
 
 	for (int ix = Wnd_Plot->setka.p_x_Left; ix < Wnd_Plot->setka.p_x_Right; ix += Wnd_Plot->setka.h_setka) {
@@ -23,7 +24,7 @@ void DrowSetka(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		LineTo(dc, Wnd_Plot->setka.p_x_Right, iy);
 	}
 	//рисуем большие клетки 
-	SetDCPenColor(dc, RGB(150, 150, 150));
+	SetDCPenColor(dc, BIG_SETKA_SQARE_COLOR);
 	for (int ix = Wnd_Plot->setka.p_x_LLeft5; ix < Wnd_Plot->setka.p_x_Right; ix += Wnd_Plot->setka.h5_setka) {
 		MoveToEx(dc, ix, Wnd_Plot->setka.p_y_BBottom5, NULL);
 		LineTo(dc, ix, Wnd_Plot->setka.p_y_Top);
@@ -33,7 +34,7 @@ void DrowSetka(HDC dc, Wnd_Plot_struct* Wnd_Plot)
 		LineTo(dc, Wnd_Plot->setka.p_x_Right, iy);
 	}
 	//рисуем оси координат и кромку
-	SetDCPenColor(dc, RGB(0, 0, 0));
+	SetDCPenColor(dc, OSI_SETKA_COLOR);
 	MoveToEx(dc, 0, Wnd_Plot->setka.p_y_Top, NULL);
 	LineTo(dc, 0, Wnd_Plot->setka.p_y_Bottom);
 	MoveToEx(dc, Wnd_Plot->setka.p_x_Left, 0, NULL);
@@ -43,7 +44,7 @@ void DrowCounts(HDC dc, Wnd_Plot_struct* Wnd_Plot, HFONT* hFont)
 {
 
 	SelectObject(dc, GetStockObject(DC_PEN));
-	SetDCPenColor(dc, RGB(0, 0, 0));
+	SetDCPenColor(dc, OSI_SETKA_COLOR);
 	SelectObject(dc, *hFont);
 	SetBkMode(dc, TRANSPARENT);
 	//рисуем числa

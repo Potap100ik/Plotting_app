@@ -14,7 +14,7 @@ const double M_PI2 = M_PI /2;
 
 using namespace std;
 
-enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, BRAKET, E, PI, XX, ATAN, ASIN, ACOS};
+enum FUNC { EXP, ABS, LOG, LOG10, POW, SQRT, SIN, COS, TAN, CTAN, BRAKET, E, PI, XX, ATAN, ACTAN, ASIN, ACOS};
 
 double Function_String_to_Double(char* str, double* x, int y = 1, bool can_delete_str = true);
 int Index_of_smth(char* str);

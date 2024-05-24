@@ -7,14 +7,14 @@ Gdiplus::Pen* GetPen_for_Integral()
 	//цвет - это последние три знака
 	//первый - прозрачность от 0 до 255
 	//второй параметр - ширина ручки в пиксел€х
-	return new Gdiplus::Pen(Gdiplus::Color(255, 255, 0, 0), 2);
+	return new Gdiplus::Pen(COLOR_FOR_INTEGRAL, WIDTH_OF_PEN_FOR_INTEGRAL);
 }
 Gdiplus::Pen* GetPen_for_Main_Plot()
 {
 	//цвет - это последние три знака
 	//первый - прозрачность
 	//второй параметр - ширина ручки в пиксел€х
-	return new Gdiplus::Pen(Gdiplus::Color(255, 48, 188, 21), 3);
+	return new Gdiplus::Pen(Gdiplus::Color(255, 48, 188, 21), WIDTH_OF_PEN_FOR_INTEGRAL);
 }
 /////////////////////////////////////////////////////
 // ќќ–ƒ»Ќј“џ ƒЋя  ќЌ“–ќЋќ¬
@@ -22,10 +22,10 @@ int Get_EDIT_FUNC_koordinates(int i)
 {
 	switch (i)
 	{
-	case 1: return 59;
-	case 2: return 32;
-	case 3: return 215;
-	case 4: return 43;
+	case 1: return EDIT_FUNC_KOORDINATES[0];
+	case 2: return EDIT_FUNC_KOORDINATES[1];
+	case 3: return EDIT_FUNC_KOORDINATES[2];
+	case 4: return EDIT_FUNC_KOORDINATES[3];
 	}
 	return 0;
 }
@@ -36,16 +36,16 @@ int Get_EDIT_ABH_koordinates(char ch, int i)
 	case 1:
 		switch (ch)
 		{
-		case 'A': return 43;
-		case 'B': return 136;
-		case 'H': return 230;
+		case 'A': return EDIT_ABH_KOORDINATES[0][0];
+		case 'B': return EDIT_ABH_KOORDINATES[0][1];
+		case 'H': return EDIT_ABH_KOORDINATES[0][2];
 		}
 
-		return 59;
+		return 0;
 
-	case 2: return 104;
-	case 3: return 50;
-	case 4: return 25;
+	case 2: return EDIT_ABH_KOORDINATES[1][0];
+	case 3: return EDIT_ABH_KOORDINATES[1][1];
+	case 4: return EDIT_ABH_KOORDINATES[1][2];
 	}
 	return 0;
 }
@@ -53,10 +53,10 @@ int Get_EDIT_INTEGRAL_koordinates(int i)
 {
 	switch (i)
 	{
-	case 1: return 94;
-	case 2: return 244;
-	case 3: return 183;
-	case 4: return 38;
+	case 1: return EDIT_INTEGRAL_KOORDINATES[0];
+	case 2: return EDIT_INTEGRAL_KOORDINATES[1];
+	case 3: return EDIT_INTEGRAL_KOORDINATES[2];
+	case 4: return EDIT_INTEGRAL_KOORDINATES[3];
 	}
 	return 0;
 }
@@ -79,38 +79,38 @@ int Get_BUTTON_ENTER_koordinates(CTL_ID id, int i)
 	case 1: //лева€ граница - х
 		switch (id)
 		{
-		case HWNDBUTTON_CLEARPLOT: return 13;
-		case HWNDBUTTON_HOME:  return 13;
+		case HWNDBUTTON_CLEARPLOT: return BUTTON_CLEARPLOT_KOORDINATES[i - 1];
+		case HWNDBUTTON_HOME:  return BUTTON_HOME_KOORDINATES[i - 1];
 
-		case HWNDBUTTON_INTEGER: return 61;
-		case HWNDBUTTON_ENTER: return 61;
+		case HWNDBUTTON_INTEGER: return BUTTON_INTEGRAL_KOORDINATES[i-1];
+		case HWNDBUTTON_ENTER: return BUTTON_ENTER_KOORDINATES[i-1];
 		}
 	case 2: //верхн€€ граница - y
 		switch (id)
 		{
-		case HWNDBUTTON_HOME:    return 145;
-		case HWNDBUTTON_ENTER: return 145;
+		case HWNDBUTTON_HOME:    return BUTTON_HOME_KOORDINATES[i - 1];
+		case HWNDBUTTON_ENTER: return BUTTON_ENTER_KOORDINATES[i - 1];
 
-		case HWNDBUTTON_CLEARPLOT:       return 193;
-		case HWNDBUTTON_INTEGER: return 193;
+		case HWNDBUTTON_CLEARPLOT:       return BUTTON_CLEARPLOT_KOORDINATES[i - 1];
+		case HWNDBUTTON_INTEGER: return BUTTON_INTEGRAL_KOORDINATES[i - 1];
 		}
 	case 3: //ширина - х
 		switch (id)
 		{
-		case HWNDBUTTON_CLEARPLOT: return 32;
-		case HWNDBUTTON_HOME:  return 32;
+		case HWNDBUTTON_CLEARPLOT: return BUTTON_CLEARPLOT_KOORDINATES[i - 1];
+		case HWNDBUTTON_HOME:  return BUTTON_HOME_KOORDINATES[i - 1];
 
-		case HWNDBUTTON_INTEGER:return 216;
-		case HWNDBUTTON_ENTER:return 216;
+		case HWNDBUTTON_INTEGER:return BUTTON_INTEGRAL_KOORDINATES[i - 1];
+		case HWNDBUTTON_ENTER:return BUTTON_ENTER_KOORDINATES[i - 1];
 		}
 	case 4: //высота - y
 		switch (id)
 		{
-		case HWNDBUTTON_HOME:      return 32;
-		case HWNDBUTTON_ENTER: return 32;
+		case HWNDBUTTON_HOME:      return BUTTON_HOME_KOORDINATES[i-1];
+		case HWNDBUTTON_ENTER: return BUTTON_ENTER_KOORDINATES[i - 1];
 
-		case HWNDBUTTON_CLEARPLOT:    return 32;
-		case HWNDBUTTON_INTEGER:return 32;
+		case HWNDBUTTON_CLEARPLOT:    return BUTTON_CLEARPLOT_KOORDINATES[i-1];
+		case HWNDBUTTON_INTEGER:return BUTTON_INTEGRAL_KOORDINATES[i - 1];
 		}
 	}
 	return 0;
@@ -148,19 +148,19 @@ COLORREF GetGradColor_for_btn(CUSTOM_BTN brush, CUSTOM_BTN side)
 	{
 	case SELECTBRUSH:
 		if (side == LEFT)
-			return RGB(23, 76, 144);
+			return BTN_SELECT_LEFT_COLOR;
 		else if (side == RIGHT)
-			return RGB(23, 76, 144);
+			return BTN_SELECT_RIGHT_COLOR;
 	case HOTBRUSH:
 		if (side == LEFT)
-			return RGB(23, 76, 144);
+			return BTN_HOT_LEFT_COLOR;
 		else if (side == RIGHT)
-			return RGB(66, 144, 218);
+			return BTN_HOT_RIGHT_COLOR;
 	case DEFAULTBRUSH:
 		if (side == LEFT)
-			return RGB(66, 144, 218);
+			return BTN_DEFAULT_LEFT_COLOR;
 		else if (side == RIGHT)
-			return RGB(23, 76, 144);
+			return BTN_DEFAULT_RIGHT_COLOR;
 	}
 	return RGB(255, 255, 255);
 }
@@ -169,11 +169,11 @@ COLORREF GetSolidColor_for_btn(CUSTOM_BTN brush)
 	switch (brush)
 	{
 	case SELECTBRUSH:
-		return RGB(23, 76, 144);
+		return BTN_SELECT_COLOR;
 	case HOTBRUSH:
-		return RGB(66, 144, 255);
+		return BTN_HOT_COLOR;
 	case DEFAULTBRUSH:
-		return RGB(66, 144, 218);
+		return BTN_DEFAULT_COLOR;
 	}
 	return RGB(255, 255, 255);
 }

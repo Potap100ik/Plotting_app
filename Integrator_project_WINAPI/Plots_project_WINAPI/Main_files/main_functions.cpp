@@ -103,10 +103,11 @@ void CorrectSetkaPos(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, int h_mi
 		Myplot.picsel[i].x = Myplot.myvec_xy[i].x * Wnd_Plot->setka.kxy_zoom;
 		Myplot.picsel[i].y = Myplot.myvec_xy[i].y * Wnd_Plot->setka.kxy_zoom;
 	}
+
 	Plotting_edges_upd(2, Wnd_Plot);
 	if (Myplot.Redraw == ALLOW)
 	{
-		if (Wnd_Plot->setka.u_x_Left < Wnd_Plot->setka.Left_Wide_Vec_UNIT || Wnd_Plot->setka.u_x_Right > Wnd_Plot->setka.Right_Wide_Vec_UNIT || count_resizing > 3)
+		if (Wnd_Plot->setka.u_x_Left < Wnd_Plot->setka.Left_Wide_Vec_UNIT || Wnd_Plot->setka.u_x_Right > Wnd_Plot->setka.Right_Wide_Vec_UNIT || count_resizing > COUNT_FOR_ZOOM_SQARES_TO_REDRAW)
 		{
 			Wide_for_vector_upd(Wnd_Plot, Myplot);
 			count_resizing = 0;

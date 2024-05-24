@@ -146,7 +146,6 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			DrowGraphSmooth(memdc, Wnd_Plot, Myplot, Pen_for_plot);
 			//DrowGraph(memdc, Wnd_Plot);оставим для экспериментов - рисование без GDI+
 		}
-
 		BitBlt(hdc2, 0, 0, Wnd_Plot->sx * 2, Wnd_Plot->sy * 2, memdc, 0, 0, SRCCOPY);
 		DeleteDC(memdc);
 		DeleteObject(membit);
@@ -154,7 +153,6 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}return 0;
 	case WM_DESTROY:
 	{
-		
 		Myplot.picsel.clear();
 		Myplot.myvec_xy.clear();
 		delete Pen_for_plot;

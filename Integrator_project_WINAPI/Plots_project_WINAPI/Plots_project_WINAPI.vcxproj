@@ -107,7 +107,7 @@
       <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Visual Leak Detector\lib\Win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
@@ -152,10 +152,6 @@
     <ResourceCompile Include="Plots_project_WINAPI.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="5260316_analytics_box_chart_diagram_graph_icon.ico" />
-    <Image Include="icon1.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="Debug_sys\debug_main_console.cpp" />
     <ClCompile Include="Integral_Wnd_Proc.cpp" />
     <ClCompile Include="Integrate\Simps_meth.cpp" />
@@ -169,6 +165,10 @@
     <ClCompile Include="Str_to_double\char_change.cpp" />
     <ClCompile Include="Str_to_double\str_to_double.cpp" />
     <ClCompile Include="WinPlot_Proc.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon_for_integral.ico" />
+    <Image Include="icon_for_main_wnd.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
