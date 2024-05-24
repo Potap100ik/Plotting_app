@@ -35,7 +35,7 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	HDC hdc2{};
 	static Gdiplus::Pen* Pen_for_plot;
 	static HFONT hFont1;
-
+	TRACKMOUSEEVENT tme;
 	switch (message)
 	{
 	case WM_CREATE:
@@ -53,6 +53,11 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 	{
 		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam), MyMouse);
+		tme.cbSize = sizeof(tme);
+		tme.hwndTrack = hWnd;
+		tme.dwFlags = TME_LEAVE;
+
+		TrackMouseEvent(&tme);
 	}return 0;
 	case WM_MOUSEMOVE:
 	{
@@ -73,6 +78,11 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				Wide_for_vector_upd(Wnd_Plot, Myplot);
 			}
 			InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
+		}
+		else
+		{
+			MyMouse.Prev_mouse_point.x = LOWORD(lParam);
+			MyMouse.Prev_mouse_point.y = HIWORD(lParam);
 		}
 	}return 0;
 	case WM_DRAW_MAIN_PLOT:
@@ -110,16 +120,25 @@ LRESULT CALLBACK Win_Plot(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		Myplot.myvec_xy.clear();
 		Wnd_Plot->text_ = (LPSTR)"";
 	}return 0;
+	case WM_MOUSELEAVE:
+	{
+		MyMouse.Flag_for_mouse = FALSE;
+	}return 0;
 	case WM_LBUTTONUP:
 	{
 		MyMouse.Flag_for_mouse = FALSE;
 	}return 0;
 	case WM_MOUSEWHEEL:
 	{
-		int a = Wnd_Plot->setka.h_setka;
-		Wnd_Plot->setka.h_setka += GET_WHEEL_DELTA_WPARAM(wParam) / 120;
+		double u_pic = Wnd_Plot->setka.unit_to_pixel;
+		Wnd_Plot->setka.h_setka += (GET_WHEEL_DELTA_WPARAM(wParam) / ZOOM_SMOOTH_COUNT);
+		CorrectSetkaPos(Wnd_Plot, Myplot, MIN_H_SETKA, MAX_H_SETKA, BASE_H_SETKA, false);
+
+		//это волшебное ощущение - когда выводимая формула наконец-то оказывается логичной и срабатывает
+		int ax = (MyMouse.Prev_mouse_point.x - Wnd_Plot->setka.sx_center) * (1 - u_pic / Wnd_Plot->setka.unit_to_pixel);
+		int ay = (MyMouse.Prev_mouse_point.y - Wnd_Plot->setka.sy_center) * (1 - u_pic / Wnd_Plot->setka.unit_to_pixel);
+		Plotting_edges_upd(3, Wnd_Plot, ax, ay);
 		CorrectSetkaPos(Wnd_Plot, Myplot, MIN_H_SETKA, MAX_H_SETKA, BASE_H_SETKA);
-		//RedrawPlot(Wnd_Plot, Myplot);
 		InvalidateRect(Wnd_Plot->hWnd, NULL, TRUE);
 	}return 0;
 	case WM_SIZE:

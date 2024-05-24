@@ -43,8 +43,10 @@ void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, d
 	}
 #endif //VECTOR_OF_INTEGER_PRINT
 	//////////////////////////////////////////////
+
 	double correct_x = 0, correct_y = 0;
 	double size_of_plot = FillIntegralVector(Myintegr, Wnd_Integral, correct_x, correct_y);
+
 #ifdef VECTOR_OF_INTEGER_PRINT
 	{
 		int i = 0;
@@ -58,9 +60,9 @@ void WND_Integral_Init(HWND hWnd_Integer_Wnd, LPSTR text_, double A, double B, d
 #endif //VECTOR_OF_INTEGER_PRINT
 
 	Wnd_Integral->setka.u5_setka = Setka_UNIT_CHANGE(size_of_plot / KOL_OF_SETKA_SQARES5);
-
-	//CorrectSetkaPos(Wnd_Integral, Myintegr.vec);
 	CorrectSetkaPos(Wnd_Integral, Myintegr.integral_plot,MIN_H_SETKA_INT,MAX_H_SETKA_INT,BASE_H_SETKA_INT);
+	//Wnd_Integral->setka.mantissa = floor((correct_x > correct_y) ? correct_x : correct_y);
+
 	Wnd_Integral->setka.sx_center = Wnd_Integral->sx / 2 - correct_x * Wnd_Integral->setka.kxy_zoom;
 	Wnd_Integral->setka.sy_center = Wnd_Integral->sy / 2 - correct_y * Wnd_Integral->setka.kxy_zoom;
 }
@@ -74,6 +76,7 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	static SMouseMove MyMouse;
 	static Gdiplus::Pen* Pen_for_INTEGRAL;
 	static HFONT hFont1;
+	TRACKMOUSEEVENT tme;
 	///////////////////////////////////////////////////
 	switch (message)
 	{
@@ -92,6 +95,11 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	case WM_LBUTTONDOWN:
 	{
 		MousePos(TRUE, LOWORD(lParam), HIWORD(lParam), MyMouse);
+		tme.cbSize = sizeof(tme);
+		tme.hwndTrack = hWnd;
+		tme.dwFlags = TME_LEAVE;
+
+		TrackMouseEvent(&tme);
 	}return 0;
 	case WM_MOUSEMOVE:
 	{
@@ -109,7 +117,15 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 			Plotting_edges_upd(2, Wnd_Integral);
 			InvalidateRect(Wnd_Integral->hWnd, NULL, TRUE);
 		}
-
+		else
+		{
+			MyMouse.Prev_mouse_point.x = LOWORD(lParam);
+			MyMouse.Prev_mouse_point.y = HIWORD(lParam);
+		}
+	}return 0;
+	case WM_MOUSELEAVE:
+	{
+		MyMouse.Flag_for_mouse = FALSE;
 	}return 0;
 	case WM_LBUTTONUP:
 	{
@@ -117,8 +133,14 @@ LRESULT CALLBACK Integral_Wnd_Proc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 	}return 0;
 	case WM_MOUSEWHEEL:
 	{
-		int a = Wnd_Integral->setka.h_setka;
-		Wnd_Integral->setka.h_setka += GET_WHEEL_DELTA_WPARAM(wParam) / 120;
+		double u_pic = Wnd_Integral->setka.unit_to_pixel;
+		Wnd_Integral->setka.h_setka += (GET_WHEEL_DELTA_WPARAM(wParam) / ZOOM_SMOOTH_COUNT);
+		CorrectSetkaPos(Wnd_Integral, Myintegr.integral_plot, MIN_H_SETKA_INT, MAX_H_SETKA_INT, BASE_H_SETKA_INT, false);
+
+		//это волшебное ощущение - когда выводимая формула наконец-то оказывается логичной и срабатывает
+		int ax = (MyMouse.Prev_mouse_point.x - Wnd_Integral->setka.sx_center) * (1 - u_pic / Wnd_Integral->setka.unit_to_pixel);
+		int ay = (MyMouse.Prev_mouse_point.y - Wnd_Integral->setka.sy_center) * (1 - u_pic / Wnd_Integral->setka.unit_to_pixel);
+		Plotting_edges_upd(3, Wnd_Integral, ax, ay);
 		CorrectSetkaPos(Wnd_Integral, Myintegr.integral_plot, MIN_H_SETKA_INT, MAX_H_SETKA_INT, BASE_H_SETKA_INT);
 		InvalidateRect(Wnd_Integral->hWnd, NULL, TRUE);
 	}return 0;

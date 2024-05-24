@@ -79,7 +79,7 @@ void MousePos(BOOL fl, int x, int y, SMouseMove& MyMouse)
 	MyMouse.Prev_mouse_point.x = x;
 	MyMouse.Prev_mouse_point.y = y;
 }
-void CorrectSetkaPos(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, int h_min, int h_max, int h_baza)
+void CorrectSetkaPos(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, int h_min, int h_max, int h_baza, bool na_skoruyu_ruku)
 {
 	static char count_resizing = 0;//ПОДСЧЕТ КОЛИЧЕСТВА ИЗМЕНЕНИЙ ДЛЯ ПЕРЕСЧЕТА ФУНКЦИИ ЧТОБЫ НЕ ТЕРЯТЬ ЕЕ ПЛАВНОСТЬ
 	if (Wnd_Plot->setka.h_setka <= h_min)
@@ -104,10 +104,11 @@ void CorrectSetkaPos(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, int h_mi
 		Myplot.picsel[i].y = Myplot.myvec_xy[i].y * Wnd_Plot->setka.kxy_zoom;
 	}
 
+
 	Plotting_edges_upd(2, Wnd_Plot);
 	if (Myplot.Redraw == ALLOW)
 	{
-		if (Wnd_Plot->setka.u_x_Left < Wnd_Plot->setka.Left_Wide_Vec_UNIT || Wnd_Plot->setka.u_x_Right > Wnd_Plot->setka.Right_Wide_Vec_UNIT || count_resizing > COUNT_FOR_ZOOM_SQARES_TO_REDRAW)
+		if (na_skoruyu_ruku && (Wnd_Plot->setka.u_x_Left < Wnd_Plot->setka.Left_Wide_Vec_UNIT || Wnd_Plot->setka.u_x_Right > Wnd_Plot->setka.Right_Wide_Vec_UNIT || count_resizing > COUNT_FOR_ZOOM_SQARES_TO_REDRAW))
 		{
 			Wide_for_vector_upd(Wnd_Plot, Myplot);
 			count_resizing = 0;
@@ -115,9 +116,9 @@ void CorrectSetkaPos(Wnd_Plot_struct* Wnd_Plot, Ploting_struct& Myplot, int h_mi
 	}
 	return;
 }
-void Plotting_edges_upd(int draw_h5_inside_or_not, Wnd_Plot_struct* Wnd_Plot)
+void Plotting_edges_upd(int upd_way, Wnd_Plot_struct* Wnd_Plot, int ax, int ay)
 {
-	switch (draw_h5_inside_or_not)
+	switch (upd_way)
 	{
 	case 0:
 		//КООРДИНАТЫ СЕТОЧНЫХ КРАЕВ В ПИКСЕЛЯХ
@@ -147,6 +148,10 @@ void Plotting_edges_upd(int draw_h5_inside_or_not, Wnd_Plot_struct* Wnd_Plot)
 		Wnd_Plot->setka.u_x_Right = Wnd_Plot->setka.p_x_Right * Wnd_Plot->setka.unit_to_pixel;
 		Wnd_Plot->setka.u_y_Top = Wnd_Plot->setka.p_y_Top * Wnd_Plot->setka.unit_to_pixel;
 		Wnd_Plot->setka.u_y_Bottom = Wnd_Plot->setka.p_y_Bottom * Wnd_Plot->setka.unit_to_pixel;
+		break;
+	case 3:
+		Wnd_Plot->setka.sx_center = Wnd_Plot->setka.sx_center + ax;
+		Wnd_Plot->setka.sy_center = Wnd_Plot->setka.sy_center + ay;
 		break;
 	}
 	return;
@@ -313,7 +318,13 @@ int CheckValues_of_edit(double A, double B, double H, HWND hWnd, HWND hWndEdit_I
 		if (isinf(error_nan) || isnan(error_nan))
 			SetWindowText(hWndEdit_Erroors, L"Найдена критическая точка");
 		else
-			SetWindowText(hWndEdit_Erroors, L"Паранормальные явления в районе try-catch");
+		{
+			wchar_t* str = (wchar_t*)malloc(MAX_LOADSTRING);
+			swprintf(str, L"Найдена критическая точка: %lg", error_nan);
+			SetWindowText(hWndEdit_Erroors, str);
+			free(str);
+			//SetWindowText(hWndEdit_Erroors, L"Паранормальные явления в районе try-catch");
+		}
 		return 1;
 	}
 	catch (ERROR_STRUCT err_msg)
@@ -331,7 +342,7 @@ double FillIntegralVector(Integral_struct& Myintegr, Wnd_Plot_struct* Wnd_Plot, 
 	Myintegr.integral_plot.picsel.clear();
 	Myintegr.integral_plot.myvec_xy.clear();
 	Pointer point;
-	double ux_max = 0, ux_min = 0;
+	double ux_max = Myintegr.B, ux_min = Myintegr.A;
 	double uy_max = 0, uy_min = 0;
 	int i = 0;
 	int j = Myintegr.vec.myvec_xy.size();
@@ -357,18 +368,18 @@ double FillIntegralVector(Integral_struct& Myintegr, Wnd_Plot_struct* Wnd_Plot, 
 	for (int i = 0; i < Myintegr.integral_plot.myvec_xy.size(); i++)
 	{
 		Myintegr.integral_plot.picsel.push_back({});
-		//Myintegr.integral_plot.myvec_xy[i].y -= y_in_center;
+		//Myintegr.integral_plot.myvec_xy[i].y -= y_in_center;//перекидывание графика к центру сетки
 		//Myintegr.integral_plot.myvec_xy[i].x -= x_in_center;
 
 		Myintegr.integral_plot.picsel[i].x = Myintegr.integral_plot.myvec_xy[i].x * Wnd_Plot->setka.kxy_zoom;
 		Myintegr.integral_plot.picsel[i].y = Myintegr.integral_plot.myvec_xy[i].y * Wnd_Plot->setka.kxy_zoom;
 	}
 	//????????????????????????????????????????????
-	correct_x = ux_max - (ux_max - ux_min) / 2;
+	correct_x = ux_max - (ux_max - ux_min) / 2;//координаты центра полученного графика
 	correct_y = uy_max - (uy_max - uy_min) / 2;
 	//????????????????????????????????????????????
 	//printf("sx-sy [%d, %d]\n", Wnd_Plot->setka.sx_center, Wnd_Plot->setka.sy_center);
-	return (ux_max - ux_min > uy_max - uy_min) ? ux_max - ux_min : uy_max - uy_min;
+	return (ux_max - ux_min > uy_max - uy_min) ? ux_max - ux_min : uy_max - uy_min;//максимальная ширина/высота у графика
 }
 
 

@@ -56,8 +56,8 @@ void PrintGlobal_WndProc_cpp()
 void EditInit()
 {
 	SetWindowText(hWndEdit_base, L"sin(x)*abs(x)");//log(x)//sin(x)*abs(x)//x*x/10
-	SetWindowText(hWndEdit_A, L"0");
-	SetWindowText(hWndEdit_B, L"10");
+	SetWindowText(hWndEdit_A, L"-1");
+	SetWindowText(hWndEdit_B, L"6");
 	SetWindowText(hWndEdit_H, L"0.1");
 	SetWindowText(hWndEdit_Integral, L"Значение интеграла");
 	SetWindowText(hWndEdit_Erroors, L"Ошибки:");

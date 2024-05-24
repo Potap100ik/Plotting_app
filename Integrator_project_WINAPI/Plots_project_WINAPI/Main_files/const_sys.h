@@ -12,7 +12,7 @@ const int POINTS_TO_ONE_PICEL = 10;//количество рассчитываемых значений графика 
 const int SYSTEMMETRICS = GetSystemMetrics(SM_CXSCREEN) * POINTS_TO_ONE_PICEL;
 const int TOCHNOST_FOR_TANGENS_INF = 100;
 const int COUNT_FOR_ZOOM_SQARES_TO_REDRAW = 3 - 1;//при сравнении исп. > поэтому число будет расно двум если вычесть единицу
-
+const int ZOOM_SMOOTH_COUNT = 120;//ОТ НУЛЯ ДО 120 ПРИ РАБОТЕ КОЛЕСИКОМ МЫШКИ
 // КОНСТАНТЫ ДЛА СЕТКИ ИНТЕГРАЛА
 const int BASE_H_SETKA_INT = 8;//размер в пикселях ширины одного маленького сеточного квадрата
 const int MIN_H_SETKA_INT = 2;

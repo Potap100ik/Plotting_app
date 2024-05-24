@@ -17,8 +17,9 @@ double Simps_method(double a, double b, char* str, double (*Function_Count)(char
 		r = (b - a) / 6 * (Function_Count(str, &a, 1, false) + 4 * Function_Count(str, &x, 1, false) + Function_Count(str, &b, 1, false));
 	}
 	catch (double err) {
-		if (isnan(err) || isinf(err))
-			throw(err);
+		//if (isnan(err) || isinf(err))
+			//throw(err);
+		throw(a);
 	}
 	catch (ERROR_STRUCT err_msg)
 	{
@@ -38,8 +39,9 @@ double Integrator(double a, double b, double h, char* str, double (*Function_Cou
 		}
 		catch (double err)
 		{
-			if (isnan(err) || isinf(err))
-				throw(err);
+			//if (isnan(err) || isinf(err))
+			//throw(err);
+			throw(i);
 		}
 		catch (ERROR_STRUCT err_msg)
 		{
@@ -53,8 +55,9 @@ double Integrator(double a, double b, double h, char* str, double (*Function_Cou
 	}
 	catch (double err)
 	{
-		if (isnan(err) || isinf(err))
-			throw(err);
+		//if (isnan(err) || isinf(err))
+		//	throw(err);
+		throw(b);
 	}
 	catch (ERROR_STRUCT err_msg)
 	{
